@@ -20,7 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".Menu" />
-        <activity android:name=".Bank"></activity>
+        <activity android:name=".Bank" />
+        <activity android:name=".SendFriends" />
+        <activity android:name=".Medals" />
+        <activity android:name=".News"></activity>
     </application>
 
 </manifest>
