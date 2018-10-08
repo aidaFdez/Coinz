@@ -26,13 +26,8 @@
     <Button
         android:id="@+id/menu"
         android:layout_width="wrap_content"
-<<<<<<< HEAD
-        android:layout_height="218dp"
-        android:layout_gravity="bottom|end"
+        android:layout_height="48dp"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
-=======
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -43,6 +38,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
->>>>>>> 20855d3e9ca2d3008c08d782c5ff62ee735cfa59
 
 </android.support.constraint.ConstraintLayout>
