@@ -8,6 +8,8 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.InputStream;
 
+import java.util.Scanner;
+
 public class DownloadFileTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls){
@@ -35,7 +37,11 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     @NonNull
     private String readStream(InputStream stream) throws IOException {
             //Read input from stream, build result as a string
-        return"";
+        //String toReturn = stream.getText();
+        //Code from https://stackoverflow.com/questions/309424/how-to-read-convert-an-inputstream-into-a-string-in-java
+        Scanner s = new Scanner(stream).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+        //return toReturn;
     }
 
     @Override

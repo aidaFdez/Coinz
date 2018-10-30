@@ -1,6 +1,7 @@
 package com.example.aafo.coinz;
 
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
@@ -33,15 +35,41 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
+    //private DownloadFileTask downloadFile;
+    private String jSon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Show the map on the screen (without the coinz)
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+
+    }
+
+    public void getTheMap(){
+        //Get the url
+        String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate();
+
+        //Use the downloadFile object for downloading the map
+        //TODO usar el result de alguna forma y conseguir el archivo de otra
+        //AsyncTask<String, Void, String> result = new DownloadFileTask().execute(url);
+        DownloadFileTask downloadFile = new DownloadFileTask();
+        downloadFile.execute(url);
+
+    }
+
+    public String getDate(){
+        Date dateObject = new Date();
+        String date = dateObject.toString();
+        //The above date is in yyyy-mm-dd format, so we want to substitute the - by /
+        String dateReturn = date.substring(0,4) + "/" + date.substring(5,7) + "/" + date.substring(8,10);
+        return dateReturn;
     }
 
     @Override
@@ -183,6 +211,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Intent intMenu = new Intent(MainActivity.this, Menu.class);
         startActivity(intMenu);
     }
-
-
 }
