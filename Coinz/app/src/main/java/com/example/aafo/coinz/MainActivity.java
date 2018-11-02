@@ -1,12 +1,15 @@
 package com.example.aafo.coinz;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -14,6 +17,8 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -23,9 +28,16 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
@@ -35,8 +47,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationEngine locationEngine;
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
-    //private DownloadFileTask downloadFile;
     private String jSon;
+
+    //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
+    private SharedPreferences sharedPrefs;
+    private static String PREF_NAME = "preferences";
+
+    private static Logger logger = Logger.getLogger("MainActivity");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,34 +65,76 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        logger.finer("The map is showing now");
 
+        getTheMap();
+        if(jSon != null){
+            //System.out.println(jSon);
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_SHORT;
 
+            Toast toast = Toast.makeText(context, jSon.substring(0,30), duration);
+            toast.show();
+        }
+        else{
+            logger.finer("The GeoJson map does not exist");
+            Context context = getApplicationContext();
+            CharSequence text = "Hello toast!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 
     public void getTheMap(){
+        logger.finer("getTheMap() has been called");
+
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+
+
         //Get the url
         String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate();
 
+        Toast toast = Toast.makeText(context, url, duration);
+        toast.show();
+
+        //TODO Asegurar que el mapa queda descargado y guardado. Abierto como en las pestanyas de firefox.
+
         //Use the downloadFile object for downloading the map
-        //TODO usar el result de alguna forma y conseguir el archivo de otra
-        //AsyncTask<String, Void, String> result = new DownloadFileTask().execute(url);
-        DownloadFileTask downloadFile = new DownloadFileTask();
-        downloadFile.execute(url);
+        try {
+            jSon = new DownloadFileTask().execute(url).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
     }
 
+    //Method for getting the date of the device
     public String getDate(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date dateObject = new Date();
-        String date = dateObject.toString();
-        //The above date is in yyyy-mm-dd format, so we want to substitute the - by /
-        String dateReturn = date.substring(0,4) + "/" + date.substring(5,7) + "/" + date.substring(8,10);
-        return dateReturn;
+        String date = dateFormat.format(dateObject);
+        return date;
     }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
         enableLocation();
+
+        //Code for showing the coins. Gotten from https://medium.com/nextome/show-a-geojson-layer-on-google-maps-osm-mapbox-on-android-cd75b8377ba
+        GeoJsonSource source = new GeoJsonSource("geojson", jSon);
+        mapboxMap.addSource(source);
+        mapboxMap.addLayer(new LineLayer("geojson", "geojson"));
+
+        FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
+
+        //Ver por que no furula
+        //List<Feature> features = featureCollection.getFeatures();
     }
 
     private void enableLocation(){
@@ -211,4 +270,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Intent intMenu = new Intent(MainActivity.this, Menu.class);
         startActivity(intMenu);
     }
+
+
+    ////////////////////////////////
+    //                            //
+    // GETTER AND SETTER FUNCTIONS//
+    //                            //
+    ////////////////////////////////
+
+    private static SharedPreferences getPrefs(Context context){
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static Integer getGold(Context context){
+        return getPrefs(context).getInt("Gold", 0);
+    }
+
+    public static void setGold(Context context, Integer amount){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Gold", amount);
+    }
+
+    public static String getJson(Context context){
+        return getPrefs(context).getString("Json", "");
+    }
+
 }
