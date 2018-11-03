@@ -18,6 +18,11 @@ import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.GeoJson;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.Point;
+import com.google.gson.JsonObject;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -29,7 +34,6 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -95,12 +99,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         //Get the url
-        String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate();
+        String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate() + "/coinzmap.geojson";
 
-        Toast toast = Toast.makeText(context, url, duration);
-        toast.show();
-
-        //TODO Asegurar que el mapa queda descargado y guardado. Abierto como en las pestanyas de firefox.
+        //Toast toast = Toast.makeText(context, url, duration);
+        //toast.show();
 
         //Use the downloadFile object for downloading the map
         try {
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Ver por que no furula
         //List<Feature> features = featureCollection.getFeatures();
+        FeatureCollection parsed = (FeatureCollection) GeoJson.parse(jSon);
     }
 
     private void enableLocation(){

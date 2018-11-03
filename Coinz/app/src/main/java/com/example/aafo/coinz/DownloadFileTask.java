@@ -18,7 +18,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
     private static Logger logger = Logger.getLogger("DownloadFileTask");
 
     //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
-    private SharedPreferences sharedPrefs;
+    /*private SharedPreferences sharedPrefs;
     private static String PREF_NAME = "preferences";
 
     private static SharedPreferences getPrefs(Context context){
@@ -29,7 +29,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Json", map);
         editor.commit();
-    }
+    }*/
     //Finished the code from the previous link
 
     @Override
