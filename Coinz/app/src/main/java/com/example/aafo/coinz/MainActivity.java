@@ -35,6 +35,10 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -133,11 +137,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapboxMap.addSource(source);
         mapboxMap.addLayer(new LineLayer("geojson", "geojson"));
 
-        FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
+        /*FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
 
         //Ver por que no furula
         //List<Feature> features = featureCollection.getFeatures();
-        FeatureCollection parsed = (FeatureCollection) GeoJson.parse(jSon);
+        FeatureCollection parsed = (FeatureCollection) GeoJson.parse(jSon);*/
+
+        //COde from http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
+        try {
+            //FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
+            JSONObject jsonMap = new JSONObject(jSon);
+            JSONArray features = jsonMap.getJSONArray("features");
+
+            for(int i = 0;i<features.length(); i++){
+                JSONObject obj = features.getJSONObject(i);
+                JSONObject geometry = obj.getJSONObject("geometry");
+
+                //HACERLO CON OTRA CLASE NUEVA COMO LO HACE LA PÁGINA ABIERTA
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void enableLocation(){
