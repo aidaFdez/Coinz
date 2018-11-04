@@ -1,9 +1,8 @@
 package com.example.aafo.coinz;
 
-import android.content.SharedPreferences;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,6 +30,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
         editor.commit();
     }*/
     //Finished the code from the previous link
+
 
     @Override
     protected String doInBackground(String... urls){
@@ -60,13 +60,11 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
             //Read input from stream, build result as a string
         //String toReturn = stream.getText();
         logger.finer("readStream() has been called");
+
         //Code from https://stackoverflow.com/questions/309424/how-to-read-convert-an-inputstream-into-a-string-in-java
         Scanner s = new Scanner(stream).useDelimiter("\\A");
         String toRet = s.hasNext() ? s.next() : "";
-        //TODO Guardar en la sharedprefs el mapa
-        //setJson(this, toRet);
         return toRet;
-        //return toReturn;
     }
 
     @Override

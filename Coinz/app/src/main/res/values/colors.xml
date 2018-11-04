@@ -3,4 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="QUID">#FFDF00</color>
+    <color name="SHIL">#0000FF</color>
+    <color name="PENY">#FF0000</color>
+    <color name="DOLR">#008000</color>
 </resources>
