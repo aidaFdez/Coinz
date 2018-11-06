@@ -156,25 +156,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-
-
-        if(jSon != null){
-            //System.out.println(jSon);
-            /*Context context = getApplicationContext();
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, jSon.substring(0,30), duration);
-            toast.show();*/
-        }
-        else{
-            logger.finer("The GeoJson map does not exist");
-            /*Context context = getApplicationContext();
-            CharSequence text = "The map could not be loaded";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();*/
-        }
     }
 
     //Code from https://stackoverflow.com/questions/37805379/mapbox-for-android-changing-color-of-a-markers-icon
