@@ -192,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void getTheMap(){
         logger.finer("getTheMap() has been called");
 
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
+        //Context context = getApplicationContext();
+        //int duration = Toast.LENGTH_SHORT;
 
 
         //Get the url
