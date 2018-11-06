@@ -123,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String curr = props.getString("currency");
 
                         if(curr.equals("SHIL")){
-                            Toast toast = Toast.makeText(context, "hey", Toast.LENGTH_LONG);
-                            toast.show();
+                            //Toast toast = Toast.makeText(context, "hey", Toast.LENGTH_LONG);
+                            //toast.show();
                             colour = getResources().getColor(R.color.SHIL);
                         }
                         if(curr.equals("QUID")){

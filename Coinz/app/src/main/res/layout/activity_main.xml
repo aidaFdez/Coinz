@@ -45,7 +45,7 @@
         mapbox:mapbox_cameraTargetLat = "55.9443771"
         mapbox:mapbox_cameraTargetLng="-3.1870091"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-        mapbox:mapbox_cameraZoom="14"
+        mapbox:mapbox_cameraZoom="16"
         />
 
 </android.support.constraint.ConstraintLayout>
