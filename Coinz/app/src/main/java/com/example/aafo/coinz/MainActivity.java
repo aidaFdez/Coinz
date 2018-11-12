@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         MarkerOptions coin = new MarkerOptions();
                         coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
                                 .icon(icon);
+                        //This actually works, the problem is the data stored in the coins. Could have Hm of not picked(?)
                         if(!(getCoinsOverall(MainActivity.this).containsKey(props.getString("id")))){
 
                             mapboxMap.addMarker(coin);
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
                         }
                         //mapboxMap.addMarker(coin);
+                        //Tal vez lo puedas hacer si
 
                         //Code from https://www.mapbox.com/android-docs/maps/overview/annotations/
                         mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
