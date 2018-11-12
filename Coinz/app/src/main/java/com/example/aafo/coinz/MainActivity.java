@@ -20,6 +20,8 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -62,6 +64,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
@@ -72,10 +76,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
     private String jSon;
-
-    //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
-    private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
 
     private static Logger logger = Logger.getLogger("MainActivity");
 
@@ -93,26 +93,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getTheMap();
 
-        /*Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, jSon.substring(0,300), duration);
-        toast.show();*/
-
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 //ArrayList<MarkerOptions> optionsList = new ArrayList<>();
                 try {
+                    //HashMap<String, String[]> pickedCoins = new HashMap<>();
                     JSONObject jSonObj = new JSONObject(jSon);
                     JSONArray features = jSonObj.getJSONArray("features");
                     for(int i=0; i<features.length();i++){
                         JSONObject feature = features.getJSONObject(i);
                         JSONObject geometry = feature.getJSONObject("geometry");
                         JSONArray coords = geometry.getJSONArray("coordinates");
-                        //JSONObject symbol = feature.getJSONObject("marker-symbol");
-                        //JSONObject color = feature.getJSONObject("marker-color");
 
                         //IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
                         //Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.location_shil);
@@ -123,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String curr = props.getString("currency");
 
                         if(curr.equals("SHIL")){
-                            //Toast toast = Toast.makeText(context, "hey", Toast.LENGTH_LONG);
-                            //toast.show();
                             colour = getResources().getColor(R.color.SHIL);
                         }
                         if(curr.equals("QUID")){
@@ -136,17 +127,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(curr.equals("DOLR")){
                             colour = getResources().getColor(R.color.DOLR);
                         }
-                        /*//Context context = getApplicationContext();
-                        int duration = Toast.LENGTH_LONG;
-
-                        Toast toast = Toast.makeText(context, curr, duration);
-                        toast.show();*/
                         Icon icon = drawableToIcon(context, R.drawable.loc_icon,colour);
 
                         MarkerOptions coin = new MarkerOptions();
                         coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
                                 .icon(icon);
-                        //optionsList.add(coin);
                         mapboxMap.addMarker(coin);
                     }
 
@@ -186,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Use the downloadFile object for downloading the map
         try {
             jSon = new DownloadFileTask().execute(url).get();
+            setJson(this, jSon);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -206,59 +192,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(MapboxMap mapboxMap) {
         map = mapboxMap;
         enableLocation();
-
-        //Code for showing the coins. Gotten from https://medium.com/nextome/show-a-geojson-layer-on-google-maps-osm-mapbox-on-android-cd75b8377ba
-        //GeoJsonSource source = new GeoJsonSource("geojson", jSon);
-        //map.addSource(source);
-        //map.addLayer(new LineLayer("geojson", "geojson"));
-
-
-        //FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
-        //List<Feature> features = featureCollection.getFeatures();
-
-        /*Ver por que no furula
-        //List<Feature> features = featureCollection.getFeatures();
-        FeatureCollection parsed = (FeatureCollection) GeoJson.parse(jSon);*/
-
-        //COde from http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
-        /*try {
-            //FeatureCollection featureCollection = FeatureCollection.fromJson(jSon);
-            JSONObject jsonMap = new JSONObject(jSon);
-            JSONArray features = jsonMap.getJSONArray("features");
-
-            for(int i = 0;i<features.length(); i++){
-                JSONObject obj = features.getJSONObject(i);
-                JSONObject geometry = obj.getJSONObject("geometry");
-
-                //HACERLO CON OTRA CLASE NUEVA COMO LO HACE LA PÁGINA ABIERTA
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-        /*ArrayList<LatLng> points= new ArrayList<>();
-        try {
-            points = (ArrayList<LatLng>) new DrawGeoJson().execute(jSon).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        if(points != null){
-            for (LatLng point : points) {
-                map.addMarker(new MarkerOptions().position(point));
-            }
-        }
-        else{
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, "No points were found", duration);
-            toast.show();
-        }*/
-
-        //GeoJsonLayer layer =
-
     }
 
     private void enableLocation(){
@@ -399,8 +332,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ////////////////////////////////
     //                            //
     // GETTER AND SETTER FUNCTIONS//
+    //   AND SHARED PREFERENCES   //
     //                            //
     ////////////////////////////////
+
+    //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
+    private SharedPreferences sharedPrefs;
+    private static String PREF_NAME = "preferences";
 
     private static SharedPreferences getPrefs(Context context){
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -417,6 +355,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static String getJson(Context context){
         return getPrefs(context).getString("Json", "");
+    }
+
+    public static void setJson(Context context, String jSon){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("Json", jSon);
+    }
+
+    //Code from https://stackoverflow.com/questions/7944601/how-to-save-hashmap-to-shared-preferences
+    Gson gson = new Gson();
+    public HashMap<String, String[]> getCoinsOverall(Context context){
+        HashMap<String, String[]> empty = new HashMap<String, String[]>();
+        empty.put("", new String[]{"", ""});
+        String storedHashMapString = getPrefs(context).getString("hashCoins", "");
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, String[]>>(){}.getType();
+        //If there is no stored hashmap, then return an empty hashmap
+        if (storedHashMapString.equals("")){
+            return empty;
+        }
+        //Transform the string into a hashmap and return it
+        HashMap<String, String[]> coinsHash = gson.fromJson(storedHashMapString, type);
+        return coinsHash;
+    }
+
+    public void addCoinsOverall(String id, String rate, String currency){
+        HashMap<String, String[]> hashCoins = getCoinsOverall(this);
+        hashCoins.put(id, new String[]{rate, currency});
     }
 
 }
