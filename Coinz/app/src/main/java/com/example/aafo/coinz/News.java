@@ -23,7 +23,7 @@ public class News extends AppCompatActivity {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        showNew();
+                        showNew(view);
                     }
                 })
                 .setPositiveButton("Purchase", new DialogInterface.OnClickListener() {
@@ -37,7 +37,7 @@ public class News extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showNew(){
+    private void showNew(View view){
 
     }
 

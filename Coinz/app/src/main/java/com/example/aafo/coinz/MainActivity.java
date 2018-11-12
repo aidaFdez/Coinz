@@ -1,6 +1,7 @@
 package com.example.aafo.coinz;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +37,7 @@ import com.mapbox.geojson.Point;
 import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
     private String jSon;
+    private HashMap<String, String[]> coinsHash = new HashMap<String, String[]>();
 
     private static Logger logger = Logger.getLogger("MainActivity");
 
@@ -91,7 +95,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.getMapAsync(this);
         logger.finer("The map is showing now");
 
-        getTheMap();
+        //If the last time that the app was opened is the same day, then do not download the coins again
+        //if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
+            setDatePrefs(MainActivity.this);
+            getTheMap();
+        //}
 
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -115,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         JSONObject props = feature.getJSONObject("properties");
                         String curr = props.getString("currency");
 
+                        //Set the colour of the marker based on the coin's currency
                         if(curr.equals("SHIL")){
                             colour = getResources().getColor(R.color.SHIL);
                         }
@@ -132,7 +141,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         MarkerOptions coin = new MarkerOptions();
                         coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
                                 .icon(icon);
-                        mapboxMap.addMarker(coin);
+                        if(!(getCoinsOverall(MainActivity.this).containsKey(props.getString("id")))){
+
+                            mapboxMap.addMarker(coin);
+                        }else{
+                            Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
+                        }
+                        //mapboxMap.addMarker(coin);
+
+                        //Code from https://www.mapbox.com/android-docs/maps/overview/annotations/
+                        mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(@NonNull Marker marker) {
+                                /*Toast.makeText(MainActivity.this, "Works", Toast.LENGTH_LONG).show();
+                                return true;*/
+                                AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
+                                try {
+                                    builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
+                                            .setTitle("Pick up the coin")
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //Pick up the coin, so store it in the coins hashmap. Then delete it
+                                                    try {
+                                                        String id = props.getString("id");
+                                                        String value = props.getString("value");
+                                                        String currency = props.getString("currency");
+                                                        addCoinsOverall(MainActivity.this, id, value, currency);
+                                                    } catch (JSONException e) {
+                                                        Log.e("putInPrefs", ""+e + props.toString());
+                                                    }
+                                                    mapboxMap.removeMarker(marker);
+                                                }
+                                            })
+                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //Nothing here, so it will close the dialog when "No" is clicked
+                                                }
+                                            });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                return true;
+                            }
+                        });
                     }
 
                 } catch (Exception e) {
@@ -351,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static void setGold(Context context, Integer amount){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Gold", amount);
+        editor.commit();
     }
 
     public static String getJson(Context context){
@@ -360,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static void setJson(Context context, String jSon){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Json", jSon);
+        editor.commit();
     }
 
     //Code from https://stackoverflow.com/questions/7944601/how-to-save-hashmap-to-shared-preferences
@@ -378,9 +435,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return coinsHash;
     }
 
-    public void addCoinsOverall(String id, String rate, String currency){
+    public void addCoinsOverall(Context context, String id, String rate, String currency){
         HashMap<String, String[]> hashCoins = getCoinsOverall(this);
         hashCoins.put(id, new String[]{rate, currency});
+        Gson gson = new Gson();
+        String hashCoinsStr = gson.toJson(hashCoins);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("hashCoins", hashCoinsStr);
+        editor.commit();
+    }
+
+    public String getDatePrefs(Context context){
+        return getPrefs(context).getString("Date", "");
+    }
+
+    public void setDatePrefs(Context context){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("Date", getDate());
+        editor.commit();
     }
 
 }
