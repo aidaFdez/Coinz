@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.content.Intent;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
     private String jSon;
-    private HashMap<String, String[]> coinsHash = new HashMap<String, String[]>();
+    private HashMap<String, Integer> coinsToday = new HashMap<String, Integer>();
 
     private static Logger logger = Logger.getLogger("MainActivity");
 
@@ -111,17 +112,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     JSONObject jSonObj = new JSONObject(jSon);
                     JSONArray features = jSonObj.getJSONArray("features");
                     for(int i=0; i<features.length();i++){
+                        //Getting all the relevant properties of each feature for creating the marker.
                         JSONObject feature = features.getJSONObject(i);
                         JSONObject geometry = feature.getJSONObject("geometry");
                         JSONArray coords = geometry.getJSONArray("coordinates");
+                        JSONObject properties = feature.getJSONObject("properties");
+                        String curr = properties.getString("currency");
 
-                        //IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
-                        //Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.location_shil);
                         Context context = getApplicationContext();
                         Integer colour = 0;
-                        //Icon icon = drawableToIcon(context, R.drawable.loc_icon, colour);
-                        JSONObject props = feature.getJSONObject("properties");
-                        String curr = props.getString("currency");
 
                         //Set the colour of the marker based on the coin's currency
                         if(curr.equals("SHIL")){
@@ -138,18 +137,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                         Icon icon = drawableToIcon(context, R.drawable.loc_icon,colour);
 
+                        String id = properties.getString("id");
+
                         MarkerOptions coin = new MarkerOptions();
                         coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
-                                .icon(icon);
+                                .icon(icon)
+                                .setSnippet(id);
+                        coinsToday.put(id, i);
                         //This actually works, the problem is the data stored in the coins. Could have Hm of not picked(?)
-                        if(!(getCoinsOverall(MainActivity.this).containsKey(props.getString("id")))){
-
+                        //If the coin has been picked up already, do not put it in the
+                        if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id")))){
                             mapboxMap.addMarker(coin);
                         }else{
-                            Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
+                            //Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
                         }
-                        //mapboxMap.addMarker(coin);
-                        //Tal vez lo puedas hacer si
 
                         //Code from https://www.mapbox.com/android-docs/maps/overview/annotations/
                         mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
@@ -157,36 +158,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             public boolean onMarkerClick(@NonNull Marker marker) {
                                 /*Toast.makeText(MainActivity.this, "Works", Toast.LENGTH_LONG).show();
                                 return true;*/
-                                AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
+                                //Create an alert dialog for checking if the user wants to pick up that coin
+                                //AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
                                 try {
-                                    builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
-                                            .setTitle("Pick up the coin")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //Pick up the coin, so store it in the coins hashmap. Then delete it
-                                                    try {
-                                                        String id = props.getString("id");
-                                                        String value = props.getString("value");
-                                                        String currency = props.getString("currency");
-                                                        addCoinsOverall(MainActivity.this, id, value, currency);
-                                                    } catch (JSONException e) {
-                                                        Log.e("putInPrefs", ""+e + props.toString());
+                                    JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
+                                            .getJSONObject("properties");
+                                    LatLng markerLtLn = marker.getPosition();
+                                    double markerLt = markerLtLn.getLatitude();
+                                    double markerLn = markerLtLn.getLongitude();
+                                    double userLt = originLocation.getLatitude();
+                                    double userLn = originLocation.getLongitude();
+                                    double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
+                                    if(distance<25.0){
+                                        AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
+                                        //Toast.makeText(MainActivity.this, "Distance less", Toast.LENGTH_LONG).show();
+                                        builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
+                                                .setTitle("Pick up the coin")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+
+                                                        //Pick up the coin, so store it in the coins hashmap. Then delete it
+                                                        try {
+                                                            //JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
+                                                            //                  .getJSONObject("properties");
+                                                            String value = props.getString("value");
+                                                            String currency = props.getString("currency");
+                                                            addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
+                                                            addCoins(MainActivity.this, currency, 1);
+                                                            changeText();
+                                                        } catch (JSONException e) {
+                                                            Log.e("putInPrefs", ""+e);
+                                                        }
+                                                        mapboxMap.removeMarker(marker);
                                                     }
-                                                    mapboxMap.removeMarker(marker);
-                                                }
-                                            })
-                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //Nothing here, so it will close the dialog when "No" is clicked
-                                                }
-                                            });
+                                                })
+                                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        //Nothing here, so it will close the dialog when "No" is clicked
+                                                    }
+                                                });
+
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }else{
+                                        Toast.makeText(MainActivity.this, "You are too far from the coin."+distance, Toast.LENGTH_LONG).show();
+                                    }
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
+                                //AlertDialog dialog = builder.create();
+                                //dialog.show();
                                 return true;
                             }
                         });
@@ -198,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+        changeText();
     }
 
     //Code from https://stackoverflow.com/questions/37805379/mapbox-for-android-changing-color-of-a-markers-icon
@@ -288,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setCameraPosition(Location location){
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
-                location.getLongitude()), 14.0));
+                location.getLongitude()), 16.0));
     }
 
     @SuppressWarnings("MissingPermission")
@@ -385,6 +410,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivity(intMenu);
     }
 
+    public void changeText(){
+        Context context = MainActivity.this;
+        int shil = getNumShil(context);
+        int dolr = getNumDolr(context);
+        int penny = getNumPenny(context);
+        int quid = getNumQuid(context);
+        String toChange = "Shellins: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid;
+        final TextView textView = (TextView) findViewById(R.id.textView);
+        textView.setText(toChange);
+    }
+
+    public void addCoins(Context context, String currency, int num){
+        if(currency.equals("SHIL")){
+            addShil(context, num);
+        }
+        if(currency.equals("DOLR")){
+            addDolr(context, num);
+        }
+        if(currency.equals("QUID")){
+            addQuid(context, num);
+        }
+        if(currency.equals("PENY")){
+            addPenny(context, num);
+        }
+    }
+
 
     ////////////////////////////////
     //                            //
@@ -455,6 +506,80 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Date", getDate());
         editor.commit();
+    }
+
+    public int getNumShil(Context context){
+        return getPrefs(context).getInt("Shil", 0);
+    }
+
+    public int getNumDolr(Context context){
+        return getPrefs(context).getInt("Dolr", 0);
+    }
+
+    public int getNumPenny(Context context){
+        return getPrefs(context).getInt("Penny", 0);
+    }
+
+    public int getNumQuid(Context context){
+        return getPrefs(context).getInt("Quid", 0);
+    }
+
+    public void addQuid(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Quid", num+actual);
+        editor.commit();
+    }
+
+    public void addDolr(Context context, int num){
+        int actual = getNumDolr(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Dolr", num+actual);
+        editor.commit();
+    }
+
+    public void addPenny(Context context, int num){
+        int actual = getNumPenny(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Penny", num+actual);
+        editor.commit();
+    }
+
+    public void addShil(Context context, int num){
+        int actual = getNumShil(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Shil", num+actual);
+        editor.commit();
+    }
+
+    //Code from https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi
+    /**
+     * Calculate distance between two points in latitude and longitude taking
+     * into account height difference. If you are not interested in height
+     * difference pass 0.0. Uses Haversine method as its base.
+     *
+     * lat1, lon1 Start point lat2, lon2 End point el1 Start altitude in meters
+     * el2 End altitude in meters
+     * @returns Distance in Meters
+     */
+    public static double getDistance(double lat1, double lat2, double lon1,
+                                  double lon2, double el1, double el2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        double height = el1 - el2;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 
 }
