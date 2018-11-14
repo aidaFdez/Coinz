@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textSize="15dp"
+        android:textSize="18dp"
         tools:layout_editor_absoluteX="45dp"
         tools:layout_editor_absoluteY="95dp"
         app:layout_constraintBottom_toBottomOf="parent"

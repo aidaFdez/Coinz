@@ -66,6 +66,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import java.util.HashMap;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location originLocation;
     private String jSon;
     private HashMap<String, Integer> coinsToday = new HashMap<String, Integer>();
+    public static HashMap<String, Float> ratesHash = new HashMap<String, Float>();
 
     private static Logger logger = Logger.getLogger("MainActivity");
 
@@ -98,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //If the last time that the app was opened is the same day, then do not download the coins again
         //if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
-            setDatePrefs(MainActivity.this);
-            getTheMap();
+        setDatePrefs(MainActivity.this);
+        getTheMap();
         //}
 
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
@@ -111,6 +113,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //HashMap<String, String[]> pickedCoins = new HashMap<>();
                     JSONObject jSonObj = new JSONObject(jSon);
                     JSONArray features = jSonObj.getJSONArray("features");
+
+                    JSONObject rates = jSonObj.getJSONObject("rates");
+                    Float rateQuid = Float.parseFloat(rates.getString("QUID"));
+                    Float ratePeny = Float.parseFloat(rates.getString("PENY"));
+                    Float rateDolr = Float.parseFloat(rates.getString("DOLR"));
+                    Float rateShil = Float.parseFloat(rates.getString("SHIL"));
+
+                    ratesHash.put("QUID", rateQuid);
+                    ratesHash.put("PENY", ratePeny);
+                    ratesHash.put("DOLR", rateDolr);
+                    ratesHash.put("SHIL", rateShil);
+
                     for(int i=0; i<features.length();i++){
                         //Getting all the relevant properties of each feature for creating the marker.
                         JSONObject feature = features.getJSONObject(i);
@@ -263,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Method for getting the date of the device
-    public String getDate(){
+    public static String getDate(){
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date dateObject = new Date();
         String date = dateFormat.format(dateObject);
@@ -452,13 +466,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    public static Integer getGold(Context context){
-        return getPrefs(context).getInt("Gold", 0);
+    public static Float getGold(Context context){
+        return getPrefs(context).getFloat("Gold", 0.0f);
     }
 
-    public static void setGold(Context context, Integer amount){
+    public static void setGold(Context context, Float amount){
         SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Gold", amount);
+        editor.putFloat("Gold", amount);
         editor.commit();
     }
 
@@ -473,8 +487,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Code from https://stackoverflow.com/questions/7944601/how-to-save-hashmap-to-shared-preferences
-    Gson gson = new Gson();
-    public HashMap<String, String[]> getCoinsOverall(Context context){
+    //Gson gson = new Gson();
+    public static HashMap<String, String[]> getCoinsOverall(Context context){
+        Gson gson = new Gson();
         HashMap<String, String[]> empty = new HashMap<String, String[]>();
         empty.put("", new String[]{"", ""});
         String storedHashMapString = getPrefs(context).getString("hashCoins", "");
@@ -488,8 +503,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return coinsHash;
     }
 
-    public void addCoinsOverall(Context context, String id, String rate, String currency){
-        HashMap<String, String[]> hashCoins = getCoinsOverall(this);
+    public static void addCoinsOverall(Context context, String id, String rate, String currency){
+        HashMap<String, String[]> hashCoins = getCoinsOverall(context);
         hashCoins.put(id, new String[]{rate, currency});
         Gson gson = new Gson();
         String hashCoinsStr = gson.toJson(hashCoins);
@@ -498,58 +513,174 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
-    public String getDatePrefs(Context context){
+    public static ArrayList<String> getCoinsUsed(Context context){
+        Gson gson = new Gson();
+        ArrayList<String> usedCoins = new ArrayList<String>();
+        String storedUsedCoins = getPrefs(context).getString("usedCoins", "");
+        java.lang.reflect.Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        if(storedUsedCoins.equals("")){
+            usedCoins.add("");
+            return usedCoins;
+        }
+        usedCoins = gson.fromJson(storedUsedCoins, type);
+        return usedCoins;
+    }
+
+    public static void addCoinsUsed(Context context, String id){
+        Gson gson = new Gson();
+        ArrayList<String> coinsUsed = getCoinsUsed(context);
+        coinsUsed.add(id);
+        String usedStr = gson.toJson(coinsUsed);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("usedCoins", usedStr);
+        editor.commit();
+    }
+
+    public static String getDatePrefs(Context context){
         return getPrefs(context).getString("Date", "");
     }
 
-    public void setDatePrefs(Context context){
+    public static void setDatePrefs(Context context){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Date", getDate());
         editor.commit();
     }
 
-    public int getNumShil(Context context){
+    public static int getNumShil(Context context){
         return getPrefs(context).getInt("Shil", 0);
     }
 
-    public int getNumDolr(Context context){
+    public static int getNumDolr(Context context){
         return getPrefs(context).getInt("Dolr", 0);
     }
 
-    public int getNumPenny(Context context){
+    public static int getNumPenny(Context context){
         return getPrefs(context).getInt("Penny", 0);
     }
 
-    public int getNumQuid(Context context){
+    public static int getNumQuid(Context context){
         return getPrefs(context).getInt("Quid", 0);
     }
 
-    public void addQuid(Context context, int num){
+    public static void addQuid(Context context, int num){
         int actual = getNumQuid(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Quid", num+actual);
         editor.commit();
     }
 
-    public void addDolr(Context context, int num){
+    public static void addDolr(Context context, int num){
         int actual = getNumDolr(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Dolr", num+actual);
         editor.commit();
     }
 
-    public void addPenny(Context context, int num){
+    public static void addPenny(Context context, int num){
         int actual = getNumPenny(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Penny", num+actual);
         editor.commit();
     }
 
-    public void addShil(Context context, int num){
+    public static void addShil(Context context, int num){
         int actual = getNumShil(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Shil", num+actual);
         editor.commit();
+    }
+
+    public static int getNumShilFriends(Context context){
+        return getPrefs(context).getInt("ShilFriends", 0);
+    }
+
+    public static int getNumDolrFriends(Context context){
+        return getPrefs(context).getInt("DolrFriends", 0);
+    }
+
+    public static int getNumQuidFriends(Context context){
+        return getPrefs(context).getInt("QuidFriends", 0);
+    }
+
+    public static int getNumPennyFriends(Context context){
+        return getPrefs(context).getInt("PennyFriends", 0);
+    }
+
+    public static void addQuidFriends(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("QuidFriends", num+actual);
+        editor.commit();
+    }
+
+    public static void addDolrFriends(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("DolrFriends", num+actual);
+        editor.commit();
+    }
+
+    public static void addShilFriends(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("ShilFriends", num+actual);
+        editor.commit();
+    }
+
+    public static void addPennyFriends(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("PennyFriends", num+actual);
+        editor.commit();
+    }
+
+    public static HashMap<String, String[]> getCoinsFriends(Context context){
+        Gson gson = new Gson();
+        HashMap<String, String[]> empty = new HashMap<String, String[]>();
+        empty.put("", new String[]{"", ""});
+        String storedHashMapString = getPrefs(context).getString("coinsFriends", "");
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, String[]>>(){}.getType();
+        //If there is no stored hashmap, then return an empty hashmap
+        if (storedHashMapString.equals("")){
+            return empty;
+        }
+        //Transform the string into a hashmap and return it
+        HashMap<String, String[]> coinsFriends = gson.fromJson(storedHashMapString, type);
+        return coinsFriends;
+    }
+
+    public static void addCoinsFriends(Context context, String id, String rate, String currency){
+        Gson gson = new Gson();
+        HashMap<String, String[]> hashCoins = getCoinsOverall(context);
+        hashCoins.put(id, new String[]{rate, currency});
+        String hashCoinsStr = gson.toJson(hashCoins);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("coinsFriends", hashCoinsStr);
+        editor.commit();
+    }
+
+    public static HashMap<String, String[]> coinsQuid = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsPeny = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsDolr = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsShil = new HashMap<String, String[]>();
+
+    //Code from https://thispointer.com/java-how-to-get-keys-by-a-value-in-hashmap-search-by-value-in-map/
+    public static void setCoins(Context context){
+        HashMap<String, String[]> hashCoins = getCoinsOverall(context);
+        for(Map.Entry<String, String[]> hash:hashCoins.entrySet()){
+            if(hashCoins.containsValue("QUID") && hash.getValue().equals("QUID")){
+                coinsQuid.put(hash.getKey(), hash.getValue());
+            }
+            if(hashCoins.containsValue("DOLR") && hash.getValue().equals("DOLR")){
+                coinsDolr.put(hash.getKey(), hash.getValue());
+            }
+            if(hashCoins.containsValue("SHIL") && hash.getValue().equals("SHIL")){
+                coinsShil.put(hash.getKey(), hash.getValue());
+            }
+            if(hashCoins.containsValue("PENY") && hash.getValue().equals("PENY")){
+                coinsPeny.put(hash.getKey(), hash.getValue());
+            }
+        }
     }
 
     //Code from https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi
