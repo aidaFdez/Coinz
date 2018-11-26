@@ -99,10 +99,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         logger.finer("The map is showing now");
 
         //If the last time that the app was opened is the same day, then do not download the coins again
-        //if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
-        setDatePrefs(MainActivity.this);
+        /*if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
+            setDatePrefs(MainActivity.this);
+
+        }*/
         getTheMap();
-        //}
+        setDatePrefs(MainActivity.this);
 
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -183,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     double userLt = originLocation.getLatitude();
                                     double userLn = originLocation.getLongitude();
                                     double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
-                                    if(distance<25.0){
+                                    //if(distance<25.0){
                                         AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
                                         //Toast.makeText(MainActivity.this, "Distance less", Toast.LENGTH_LONG).show();
                                         builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
@@ -216,9 +218,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                         AlertDialog dialog = builder.create();
                                         dialog.show();
-                                    }else{
-                                        Toast.makeText(MainActivity.this, "You are too far from the coin."+distance, Toast.LENGTH_LONG).show();
-                                    }
+                                    //}else{
+                                    //    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
+                                    //}
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -430,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int dolr = getNumDolr(context);
         int penny = getNumPenny(context);
         int quid = getNumQuid(context);
-        String toChange = "Shellins: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid;
+        String toChange = "Shellins: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid+"\nGold: "+getGold(MainActivity.this);
         final TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(toChange);
     }
@@ -503,6 +505,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return coinsHash;
     }
 
+    public static void setCoinsOverall(Context context, HashMap<String, String[]> coinsOverall){
+        Gson gson = new Gson();
+        String hashCoinsStr = gson.toJson(coinsOverall);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("hashCoins", hashCoinsStr);
+        editor.commit();
+    }
+
     public static void addCoinsOverall(Context context, String id, String rate, String currency){
         HashMap<String, String[]> hashCoins = getCoinsOverall(context);
         hashCoins.put(id, new String[]{rate, currency});
@@ -569,10 +579,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
+    public static void subQuid(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Quid", -num+actual);
+        editor.commit();
+    }
+
     public static void addDolr(Context context, int num){
         int actual = getNumDolr(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Dolr", num+actual);
+        editor.commit();
+    }
+
+    public static void subDolr(Context context, int num){
+        int actual = getNumDolr(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Dolr", -num+actual);
         editor.commit();
     }
 
@@ -583,6 +607,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
+    public static void subPenny(Context context, int num){
+        int actual = getNumPenny(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Penny", -num+actual);
+        editor.commit();
+    }
+
     public static void addShil(Context context, int num){
         int actual = getNumShil(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -590,21 +621,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
-    public static int getNumShilFriends(Context context){
-        return getPrefs(context).getInt("ShilFriends", 0);
+    public static void subShil(Context context, int num){
+        int actual = getNumShil(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Shil", -num+actual);
+        editor.commit();
     }
 
-    public static int getNumDolrFriends(Context context){
-        return getPrefs(context).getInt("DolrFriends", 0);
-    }
+    public static int getNumShilFriends(Context context){ return getPrefs(context).getInt("ShilFriends", 0);}
 
-    public static int getNumQuidFriends(Context context){
-        return getPrefs(context).getInt("QuidFriends", 0);
-    }
+    public static int getNumDolrFriends(Context context){ return getPrefs(context).getInt("DolrFriends", 0); }
 
-    public static int getNumPennyFriends(Context context){
-        return getPrefs(context).getInt("PennyFriends", 0);
-    }
+    public static int getNumQuidFriends(Context context){ return getPrefs(context).getInt("QuidFriends", 0); }
+
+    public static int getNumPennyFriends(Context context){ return getPrefs(context).getInt("PennyFriends", 0); }
 
     public static void addQuidFriends(Context context, int num){
         int actual = getNumQuid(context);
@@ -664,21 +694,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static HashMap<String, String[]> coinsDolr = new HashMap<String, String[]>();
     public static HashMap<String, String[]> coinsShil = new HashMap<String, String[]>();
 
-    //Code from https://thispointer.com/java-how-to-get-keys-by-a-value-in-hashmap-search-by-value-in-map/
+    //Set the hashmaps for each of the coins.
     public static void setCoins(Context context){
         HashMap<String, String[]> hashCoins = getCoinsOverall(context);
-        for(Map.Entry<String, String[]> hash:hashCoins.entrySet()){
-            if(hashCoins.containsValue("QUID") && hash.getValue().equals("QUID")){
-                coinsQuid.put(hash.getKey(), hash.getValue());
+        for(String hash:hashCoins.keySet()){
+            String[] content = hashCoins.get(hash);
+            if (content[1].equals("QUID")){
+                coinsQuid.put(hash, content);
             }
-            if(hashCoins.containsValue("DOLR") && hash.getValue().equals("DOLR")){
-                coinsDolr.put(hash.getKey(), hash.getValue());
+            if (content[1].equals("DOLR")){
+                coinsDolr.put(hash, content);
             }
-            if(hashCoins.containsValue("SHIL") && hash.getValue().equals("SHIL")){
-                coinsShil.put(hash.getKey(), hash.getValue());
+            if (content[1].equals("PENY")){
+                coinsPeny.put(hash, content);
             }
-            if(hashCoins.containsValue("PENY") && hash.getValue().equals("PENY")){
-                coinsPeny.put(hash.getKey(), hash.getValue());
+            if (content[1].equals("SHIL")){
+                coinsShil.put(hash, content);
             }
         }
     }
