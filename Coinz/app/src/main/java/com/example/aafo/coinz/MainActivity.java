@@ -161,8 +161,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .setSnippet(id);
                         coinsToday.put(id, i);
                         //This actually works, the problem is the data stored in the coins. Could have Hm of not picked(?)
-                        //If the coin has been picked up already, do not put it in the
-                        if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id")))){
+                        //If the coin has been picked up already, do not put it in the map
+                        if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id"))) &&
+                           !(getPickedCoins(MainActivity.this).contains(properties.getString("id")))){
                             mapboxMap.addMarker(coin);
                         }else{
                             //Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
@@ -202,7 +203,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                             String currency = props.getString("currency");
                                                             addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
                                                             addCoins(MainActivity.this, currency, 1);
+                                                            //addCoinsSw(MainActivity.this, 1, currency);
                                                             changeText();
+                                                            addPickedCoin(MainActivity.this, marker.getSnippet());
                                                         } catch (JSONException e) {
                                                             Log.e("putInPrefs", ""+e);
                                                         }
@@ -380,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume(){
         super.onResume();
         mapView.onResume();
+        changeText();
     }
 
     @Override
@@ -450,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(currency.equals("PENY")){
             addPenny(context, num);
         }
+
     }
 
 
@@ -466,6 +471,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private static SharedPreferences getPrefs(Context context){
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    private static void addPickedCoin(Context context, String picked){
+        Gson gson = new Gson();
+        ArrayList<String> pickedCoins = getPickedCoins(context);
+        pickedCoins.add(picked);
+        String arrayPickedStr = gson.toJson(pickedCoins);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("arrayPicked", arrayPickedStr);
+        editor.commit();
+
+    }
+
+    private static ArrayList<String> getPickedCoins(Context context){
+        Gson gson = new Gson();
+        ArrayList<String> empty = new ArrayList<String>();
+        empty.add("");
+        String storedArrayString = getPrefs(context).getString("arrayPicked", "");
+        java.lang.reflect.Type type = new TypeToken<ArrayList<String>>(){}.getType();
+        if(storedArrayString.equals("")){
+            return empty;
+        }
+        ArrayList<String> array = gson.fromJson(storedArrayString, type);
+        return array;
     }
 
     public static Float getGold(Context context){
@@ -572,6 +601,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return getPrefs(context).getInt("Quid", 0);
     }
 
+    public static void addCoinsSw(Context context, int num, String currency){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        switch(currency){
+            case "QUID":
+                int quids = getNumQuid(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("Quid", num+quids);
+                //editor.commit();
+
+            case "DOLR":
+                int dolrs = getNumDolr(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("Dolr", num+dolrs);
+                //editor.commit();
+
+            case "PENY":
+                int pennies = getNumPenny(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("Penny", num+pennies);
+                //editor.commit();
+
+            case "SHIL":
+                int shils = getNumShil(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("Shil", num+shils);
+                //editor.commit();
+        }
+        editor.commit();
+    }
+
     public static void addQuid(Context context, int num){
         int actual = getNumQuid(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -637,31 +696,88 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static int getNumPennyFriends(Context context){ return getPrefs(context).getInt("PennyFriends", 0); }
 
     public static void addQuidFriends(Context context, int num){
-        int actual = getNumQuid(context);
+        int actual = getNumQuidFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("QuidFriends", num+actual);
         editor.commit();
     }
 
     public static void addDolrFriends(Context context, int num){
-        int actual = getNumQuid(context);
+        int actual = getNumDolrFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("DolrFriends", num+actual);
         editor.commit();
     }
 
     public static void addShilFriends(Context context, int num){
-        int actual = getNumQuid(context);
+        int actual = getNumShilFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("ShilFriends", num+actual);
         editor.commit();
     }
 
     public static void addPennyFriends(Context context, int num){
-        int actual = getNumQuid(context);
+        int actual = getNumPennyFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("PennyFriends", num+actual);
         editor.commit();
+    }
+
+    public static void subQuidFriends(Context context, int num){
+        int actual = getNumQuidFriends(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("QuidFriends", -num+actual);
+        editor.commit();
+    }
+
+    public static void subDolrFriends(Context context, int num){
+        int actual = getNumDolrFriends(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("DolrFriends", -num+actual);
+        editor.commit();
+    }
+
+    public static void subShilFriends(Context context, int num){
+        int actual = getNumShilFriends(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("ShilFriends", -num+actual);
+        editor.commit();
+    }
+
+    public static void subPennyFriends(Context context, int num){
+        int actual = getNumPennyFriends(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("PennyFriends", -num+actual);
+        editor.commit();
+    }
+
+    public static void subCoinsFriends(Context context, int num, String currency){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        switch(currency){
+            case "QUID":
+                int quids = getNumQuidFriends(context);
+                editor.putInt("QuidFriends", -num+quids);
+                editor.commit();
+
+            case "DOLR":
+                int dlrs = getNumDolrFriends(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("DolrFriends", -num+dlrs);
+                editor.commit();
+
+            case "SHIL":
+                int shils = getNumShilFriends(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("ShilFriends", -num+shils);
+                editor.commit();
+
+            case "PENY":
+                int pennies = getNumPennyFriends(context);
+                //SharedPreferences.Editor editor = getPrefs(context).edit();
+                editor.putInt("PennyFriends", -num+pennies);
+                editor.commit();
+        }
+
     }
 
     public static HashMap<String, String[]> getCoinsFriends(Context context){
@@ -677,6 +793,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Transform the string into a hashmap and return it
         HashMap<String, String[]> coinsFriends = gson.fromJson(storedHashMapString, type);
         return coinsFriends;
+    }
+
+    public static void setCoinsOverallFriends(Context context, HashMap<String, String[]> coinsOverallFriends){
+        Gson gson = new Gson();
+        String hashCoinsStr = gson.toJson(coinsOverallFriends);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("coinsFriends", hashCoinsStr);
+        editor.commit();
     }
 
     public static void addCoinsFriends(Context context, String id, String rate, String currency){
@@ -710,6 +834,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (content[1].equals("SHIL")){
                 coinsShil.put(hash, content);
+            }
+        }
+    }
+
+    public static HashMap<String, String[]> coinsQuidFriends = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsPenyFriends = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsDolrFriends = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsShilFriends = new HashMap<String, String[]>();
+
+    public static void setCoinsFriends(Context context){
+        HashMap<String, String[]> hashCoins = getCoinsFriends(context);
+        for(String hash:hashCoins.keySet()){
+            String[] content = hashCoins.get(hash);
+            if (content[1].equals("QUID")){
+                coinsQuidFriends.put(hash, content);
+            }
+            if (content[1].equals("DOLR")){
+                coinsDolrFriends.put(hash, content);
+            }
+            if (content[1].equals("PENY")){
+                coinsPenyFriends.put(hash, content);
+            }
+            if (content[1].equals("SHIL")){
+                coinsShilFriends.put(hash, content);
             }
         }
     }
