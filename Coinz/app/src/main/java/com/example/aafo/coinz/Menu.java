@@ -30,7 +30,7 @@ public class Menu extends AppCompatActivity {
     }
 
     public void goToSend (View view){
-        Intent intSend = new Intent(Menu.this, SendFriends.class);
+        Intent intSend = new Intent(Menu.this, LoginActivity.class);
         startActivity(intSend);
     }
 }
