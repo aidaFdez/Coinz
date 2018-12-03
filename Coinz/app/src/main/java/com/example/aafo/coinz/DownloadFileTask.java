@@ -16,22 +16,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
 
     private static Logger logger = Logger.getLogger("DownloadFileTask");
 
-    //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
-    /*private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
-
-    private static SharedPreferences getPrefs(Context context){
-        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-    }
-
-    public static void setJson(Context context, String map){
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putString("Json", map);
-        editor.commit();
-    }*/
-    //Finished the code from the previous link
-
-
+    //Code from the lecture slides
     @Override
     protected String doInBackground(String... urls){
         try{
@@ -57,7 +42,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
 
     @NonNull
     private String readStream(InputStream stream) throws IOException {
-            //Read input from stream, build result as a string
+        //Read input from stream, build result as a string
         //String toReturn = stream.getText();
         logger.finer("readStream() has been called");
 

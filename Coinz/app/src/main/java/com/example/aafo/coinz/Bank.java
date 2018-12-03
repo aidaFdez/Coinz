@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -38,6 +39,7 @@ public class Bank extends AppCompatActivity {
 
     }
 
+    //Displaying all the data on the screen
     public void displayInfo(){
         HashMap<String, Float> ratesHash = MainActivity.ratesHash;
         final TextView textView = (TextView) findViewById(R.id.info); //penny, dollar shilling quid
@@ -46,6 +48,7 @@ public class Bank extends AppCompatActivity {
                             + "\nShilling rate: " + ratesHash.get("SHIL").toString()
                             + "\nQuid rate: " + ratesHash.get("QUID").toString()
                             + "\nGold stored: "+MainActivity.getGold(Bank.this);
+        Toast.makeText(Bank.this, toChange, Toast.LENGTH_LONG).show();
         textView.setText(toChange);
     }
 
@@ -152,21 +155,17 @@ public class Bank extends AppCompatActivity {
             if(numQuid >= quidCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=quidCount){
                 //Cash the coins from the own ones collected
                 cashFromOwn(Bank.this, quidCount, used, keys, coinsOverall, quidHash, "QUID");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user has cashed all their own coins in one day or does not have any coin of their own, then cash from friend's coins
             else if(numQuidFr>=quidCount && (getCoinsCashed(Bank.this)>=25|numQuid==0)){
                 //Cash the coins from the user
                 cashFromFriends(Bank.this, quidCount, used, keys, coinsFriends, quidHash, "QUID");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
             else if(quidCount<(25-getCoinsCashed(Bank.this))){
-                //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4
+                //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4 from own and 1 from friends
                 int quidToCash = Math.min(25-getCoinsCashed(Bank.this), quidCount);
                 int quidFromFr = quidCount-quidToCash;
                 cashFromOwn(Bank.this, quidToCash, used, keys, coinsOverall, quidHash, "QUID");
@@ -205,16 +204,12 @@ public class Bank extends AppCompatActivity {
             if(numDolr >= dolrCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=dolrCount){
                 //Cash the coins from the own ones collected
                 cashFromOwn(Bank.this, dolrCount, used, keys, coinsOverall, dolrHash, "DOLR");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user has cashed all their own coins in one day or does not have any coin of their own, then cash from friend's coins
             else if(numDolrFr>=dolrCount && (getCoinsCashed(Bank.this)>=25|numDolr==0)){
                 //Cash the coins from the user
                 cashFromFriends(Bank.this, dolrCount, used, keys, coinsFriends, dolrHash, "DOLR");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
@@ -258,16 +253,12 @@ public class Bank extends AppCompatActivity {
             if(numPeny >= penyCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=penyCount){
                 //Cash the coins from the own ones collected
                 cashFromOwn(Bank.this, penyCount, used, keys, coinsOverall, penyHash, "PENY");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user has cashed all their own coins in one day or does not have any coin of their own, then cash from friend's coins
             else if(numPenyFr>=penyCount && (getCoinsCashed(Bank.this)>=25|numPeny==0)){
                 //Cash the coins from the user
                 cashFromFriends(Bank.this, penyCount, used, keys, coinsFriends, penyHash, "PENY");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
@@ -311,16 +302,12 @@ public class Bank extends AppCompatActivity {
             if(numShil >= shilCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=shilCount){
                 //Cash the coins from the own ones collected
                 cashFromOwn(Bank.this, shilCount, used, keys, coinsOverall, shilHash, "SHIL");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user has cashed all their own coins in one day or does not have any coin of their own, then cash from friend's coins
             else if(numShilFr>=shilCount && (getCoinsCashed(Bank.this)>=25|numShil==0)){
                 //Cash the coins from the user
                 cashFromFriends(Bank.this, shilCount, used, keys, coinsFriends, shilHash, "SHIL");
-                //displayInfo();
-                //displayQuid();
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins

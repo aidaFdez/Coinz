@@ -3,6 +3,7 @@ package com.example.aafo.coinz;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -43,6 +44,8 @@ import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
+//Followed the youtube videos https://www.youtube.com/watch?v=lF5m4o_CuNg&list=PLbte_tgDKVWQOCRIzkgEQ8umdn_S6ZnHr
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -75,7 +78,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    Button mEmailSignInButton;
+    Button mEmailRegButton;
+    Button signInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +107,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        mEmailRegButton = (Button) findViewById(R.id.register_button);
+        mEmailRegButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (validate()){
@@ -117,15 +121,54 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
                                 Toast.makeText(LoginActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                                finish();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             }
                             else{
-                                Toast.makeText(LoginActivity.this, "Regitration gone wrong", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "Registration gone wrong", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }
             }
         });
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        //If the user is logged in, then stop this activity and go to the main one
+        if(user != null){
+            finish();
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+        }
+
+        signInButton = (Button) findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validate()){
+                    String userEmail = mEmailView.getText().toString().trim();
+                    String userPassword = mPasswordView.getText().toString().trim();
+
+                    mAuth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                                finish();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            }
+                            else{
+                                Toast.makeText(LoginActivity.this, "Login gone wrong", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+
+
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
