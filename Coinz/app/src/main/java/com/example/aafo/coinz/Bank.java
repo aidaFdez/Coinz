@@ -159,7 +159,6 @@ public class Bank extends AppCompatActivity {
 
             //If the user has cashed all their own coins in one day or does not have any coin of their own, then cash from friend's coins
             else if(numQuidFr>=quidCount && (getCoinsCashed(Bank.this)>=25|numQuid==0)){
-                //Cash the coins from the user
                 cashFromFriends(Bank.this, quidCount, used, keys, coinsFriends, quidHash, "QUID");
             }
 

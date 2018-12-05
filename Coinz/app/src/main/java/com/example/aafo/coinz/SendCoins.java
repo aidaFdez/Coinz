@@ -17,10 +17,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SendCoins extends AppCompatActivity {
 
@@ -57,9 +59,13 @@ public class SendCoins extends AppCompatActivity {
 
     public void sendQuid(View view){
         String emailString = emailToSend.getText().toString().trim();
+        if(emailString.isEmpty()){
+            Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
+            return;
+        }
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
-        HashMap<String, String[]> coinsToSend = new HashMap<String, String[]>();
+        //DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
+        //Map<String, String[]> coinsToSend = new HashMap<String, String[]>();
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
@@ -72,20 +78,27 @@ public class SendCoins extends AppCompatActivity {
             List<String> keys = new ArrayList(quidHash.keySet());
 
             for (int i = 0; i <quidCount; i++) {
-                //float rate = MainActivity.ratesHash.get(currency);
-                //float value = Float.parseFloat(coinHash.get(keys.get(i))[0]);
-                //goldToAdd = goldToAdd + (rate * value);
-                coinsToSend.put(keys.get(i), quidHash.get(keys.get(i)));
-                coinsOverall.remove(keys.get(i));
+                String id = keys.get(i);
+                String[] charact = quidHash.get(id);
+                //coinsToSend.put(keys.get(i), quidHash.get(keys.get(i)));
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
-                MainActivity.coinsQuid.remove(keys.get(i));
-                MainActivity.subQuid(SendCoins.this, 1);
 
-                db.collection("coins").document("quids").set(coinsToSend)
+                Gson gson = new Gson();
+                String arraySendStr = gson.toJson(charact);
+                int index = i;
+
+                Map<String, String> map = new HashMap<String, String>();
+                map.put(charact[0], charact[1]);
+
+                db.collection(emailString).document(id).set(map)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        MainActivity.coinsQuid.remove(keys.get(index));
+                        MainActivity.subQuid(SendCoins.this, 1);
+                        coinsOverall.remove(keys.get(index));
                         Toast.makeText(SendCoins.this, "The coins were sent successfully", Toast.LENGTH_SHORT);
+                        displayQuid();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
