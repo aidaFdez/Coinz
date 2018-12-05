@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +92,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         users = database.getReference("Users");
         mAuth = FirebaseAuth.getInstance();
 
+        FirebaseUser user = mAuth.getCurrentUser();
+        //If the user is logged in, then stop this activity and go to the main one
+        if(user != null){
+            finish();
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+        }
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -133,14 +142,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        FirebaseUser user = mAuth.getCurrentUser();
 
-        //If the user is logged in, then stop this activity and go to the main one
-        if(user != null){
-            finish();
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
-        }
 
         signInButton = (Button) findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new OnClickListener() {

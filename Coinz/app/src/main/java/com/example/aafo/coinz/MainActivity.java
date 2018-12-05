@@ -173,10 +173,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(@NonNull Marker marker) {
-                                /*Toast.makeText(MainActivity.this, "Works", Toast.LENGTH_LONG).show();
-                                return true;*/
-                                //Create an alert dialog for checking if the user wants to pick up that coin
-                                //AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
                                 try {
                                     JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
                                             .getJSONObject("properties");
@@ -259,15 +255,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void getTheMap(){
         logger.finer("getTheMap() has been called");
 
-        //Context context = getApplicationContext();
-        //int duration = Toast.LENGTH_SHORT;
-
-
         //Get the url
         String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate() + "/coinzmap.geojson";
-
-        //Toast toast = Toast.makeText(context, url, duration);
-        //toast.show();
 
         //Use the downloadFile object for downloading the map
         try {
@@ -837,6 +826,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+
 
     public static HashMap<String, String[]> coinsQuidFriends = new HashMap<String, String[]>();
     public static HashMap<String, String[]> coinsPenyFriends = new HashMap<String, String[]>();

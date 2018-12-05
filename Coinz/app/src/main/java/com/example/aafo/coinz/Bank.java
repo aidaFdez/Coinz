@@ -151,6 +151,8 @@ public class Bank extends AppCompatActivity {
             HashMap<String, String[]> quidHash = MainActivity.coinsQuid;
             ArrayList<String> keys = new ArrayList(quidHash.keySet());
 
+            //TODO get also the quid from friends for the keys! It is empty when cashing just from friends.
+
             //If the number of coins to change can be covered by the user's coins, use them
             if(numQuid >= quidCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=quidCount){
                 //Cash the coins from the own ones collected
