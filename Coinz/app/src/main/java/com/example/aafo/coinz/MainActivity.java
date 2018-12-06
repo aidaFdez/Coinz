@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String TAG = "onCreate";
         super.onCreate(savedInstanceState);
 
         //Show the map on the screen (without the coinz)
@@ -99,11 +100,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         logger.finer("The map is showing now");
 
         //If the last time that the app was opened is the same day, then do not download the coins again
-        /*if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
+        if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
+            Log.d(TAG, "Download the map");
+            getTheMap();
             setDatePrefs(MainActivity.this);
 
-        }*/
-        getTheMap();
+        }else{
+            Log.d(TAG, "Map already downloaded");
+            jSon = getJson(MainActivity.this);
+        }
         setDatePrefs(MainActivity.this);
 
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
@@ -179,10 +184,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     LatLng markerLtLn = marker.getPosition();
                                     double markerLt = markerLtLn.getLatitude();
                                     double markerLn = markerLtLn.getLongitude();
-                                    double userLt = originLocation.getLatitude();
-                                    double userLn = originLocation.getLongitude();
-                                    double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
-                                    //if(distance<25.0){
+
+                                    AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
+                                    builderr.setTitle("Wait").setMessage("Pleas wait for the location to load.");
+                                    AlertDialog dialogg = builderr.create();
+                                    if(originLocation == null){
+                                        dialogg.show();
+                                    }else{
+                                        double userLt = originLocation.getLatitude();
+                                        double userLn = originLocation.getLongitude();
+                                        double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
+                                        //if(distance<25.0){
                                         AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
                                         //Toast.makeText(MainActivity.this, "Distance less", Toast.LENGTH_LONG).show();
                                         builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
@@ -217,6 +229,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                         AlertDialog dialog = builder.create();
                                         dialog.show();
+                                    }
+
                                     //}else{
                                     //    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
                                     //}
@@ -854,6 +868,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 coinsShilFriends.put(hash, content);
             }
         }
+    }
+
+    //Reset the variables that need to be reseted depending on the date, like coins that have been picked up that day or goals.
+    public static void resetVariables(Context context){
+        
     }
 
     //Code from https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi

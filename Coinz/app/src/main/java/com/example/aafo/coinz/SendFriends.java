@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -45,12 +46,15 @@ public class SendFriends extends AppCompatActivity {
     }
 
     public void receiveCoins(View view){
+        String TAG = "receiveCoins";
+        Log.d(TAG, "Receiving coins from Firebase");
         FirebaseUser user = mAuth.getCurrentUser();
         String email = user.getEmail();
 
         database.collection(email).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                Log.d(TAG, "The data was downloaded successfully");
                 if (!queryDocumentSnapshots.isEmpty()){
                     HashMap<String, String[]> coinsFriendsOverall = MainActivity.getCoinsFriends(SendFriends.this);
                     List<DocumentSnapshot> coins = queryDocumentSnapshots.getDocuments();
@@ -61,7 +65,7 @@ public class SendFriends extends AppCompatActivity {
                         String value = currency[0].toString();
                         String curr = values.get(currency[0]).toString();
                         MainActivity.addCoinsFriends(SendFriends.this, id, curr, value);
-                        Toast.makeText(SendFriends.this, "Currency "+ curr+ " Value " + value, Toast.LENGTH_SHORT).show();
+                        Log.d(TAG,"Saving coin with id"+ id +" currency "+ curr+ " Value " + value);
                         coinsFriendsOverall.put(id, new String[]{value, curr});
                         MainActivity.setCoinsOverallFriends(SendFriends.this, coinsFriendsOverall);
 
@@ -88,7 +92,7 @@ public class SendFriends extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
+                Toast.makeText(SendFriends.this, "The data could not be accessed", Toast.LENGTH_SHORT).show();
             }
         });
     }
