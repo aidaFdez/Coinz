@@ -52,6 +52,7 @@ public class SendFriends extends AppCompatActivity {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()){
+                    HashMap<String, String[]> coinsFriendsOverall = MainActivity.getCoinsFriends(SendFriends.this);
                     List<DocumentSnapshot> coins = queryDocumentSnapshots.getDocuments();
                     for(DocumentSnapshot document:coins){
                         String id = document.getId();
@@ -61,6 +62,8 @@ public class SendFriends extends AppCompatActivity {
                         String curr = values.get(currency[0]).toString();
                         MainActivity.addCoinsFriends(SendFriends.this, id, curr, value);
                         Toast.makeText(SendFriends.this, "Currency "+ curr+ " Value " + value, Toast.LENGTH_SHORT).show();
+                        coinsFriendsOverall.put(id, new String[]{value, curr});
+                        MainActivity.setCoinsOverallFriends(SendFriends.this, coinsFriendsOverall);
 
                         if(curr.equals("QUID")){
                             MainActivity.addQuidFriends(SendFriends.this, 1);

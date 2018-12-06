@@ -785,6 +785,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public static void setCoinsOverallFriends(Context context, HashMap<String, String[]> coinsOverallFriends){
+        String TAG = "setCoinsOverallFriends";
+        Log.d(TAG, "Setting the overall friends coins");
         Gson gson = new Gson();
         String hashCoinsStr = gson.toJson(coinsOverallFriends);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -793,8 +795,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public static void addCoinsFriends(Context context, String id, String rate, String currency){
+        String TAG = "addCoinsFriends";
+        Log.d(TAG, "Adding coin " + id);
         Gson gson = new Gson();
-        HashMap<String, String[]> hashCoins = getCoinsOverall(context);
+        HashMap<String, String[]> hashCoins = getCoinsFriends(context);
         hashCoins.put(id, new String[]{rate, currency});
         String hashCoinsStr = gson.toJson(hashCoins);
         SharedPreferences.Editor editor = getPrefs(context).edit();
