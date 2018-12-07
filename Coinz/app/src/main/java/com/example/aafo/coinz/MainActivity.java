@@ -84,11 +84,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HashMap<String, Integer> coinsToday = new HashMap<String, Integer>();
     public static HashMap<String, Float> ratesHash = new HashMap<String, Float>();
 
-    private static Logger logger = Logger.getLogger("MainActivity");
+    private String TAG = "MainActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String TAG = "onCreate";
         super.onCreate(savedInstanceState);
 
         //Show the map on the screen (without the coinz)
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-        logger.finer("The map is showing now");
+        Log.d(TAG, "The map is showing now");
 
         //If the last time that the app was opened is the same day, then do not download the coins again
         if(!(getDate().equals(getDatePrefs(MainActivity.this)))){
@@ -218,6 +218,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                             Log.e("putInPrefs", ""+e);
                                                         }
                                                         mapboxMap.removeMarker(marker);
+                                                        if(Medals.checkGoals(context)){
+                                                            Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     }
                                                 })
                                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getTheMap(){
-        logger.finer("getTheMap() has been called");
+        Log.d(TAG, "getTheMap() has been called");
 
         //Get the url
         String url = "http://homepages.inf.ed.ac.uk/stg/coinz/" + getDate() + "/coinzmap.geojson";
@@ -476,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    private static void addPickedCoin(Context context, String picked){
+    public static void addPickedCoin(Context context, String picked){
         Gson gson = new Gson();
         ArrayList<String> pickedCoins = getPickedCoins(context);
         pickedCoins.add(picked);
@@ -486,8 +489,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
 
     }
-
-    private static ArrayList<String> getPickedCoins(Context context){
+    public static ArrayList<String> getPickedCoins(Context context){
         Gson gson = new Gson();
         ArrayList<String> empty = new ArrayList<String>();
         empty.add("");
@@ -503,7 +505,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static Float getGold(Context context){
         return getPrefs(context).getFloat("Gold", 0.0f);
     }
-
     public static void setGold(Context context, Float amount){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putFloat("Gold", amount);
@@ -513,7 +514,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static String getJson(Context context){
         return getPrefs(context).getString("Json", "");
     }
-
     public static void setJson(Context context, String jSon){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Json", jSon);
@@ -536,7 +536,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         HashMap<String, String[]> coinsHash = gson.fromJson(storedHashMapString, type);
         return coinsHash;
     }
-
     public static void setCoinsOverall(Context context, HashMap<String, String[]> coinsOverall){
         Gson gson = new Gson();
         String hashCoinsStr = gson.toJson(coinsOverall);
@@ -544,7 +543,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putString("hashCoins", hashCoinsStr);
         editor.commit();
     }
-
     public static void addCoinsOverall(Context context, String id, String rate, String currency){
         HashMap<String, String[]> hashCoins = getCoinsOverall(context);
         hashCoins.put(id, new String[]{rate, currency});
@@ -567,7 +565,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         usedCoins = gson.fromJson(storedUsedCoins, type);
         return usedCoins;
     }
-
     public static void addCoinsUsed(Context context, String id){
         Gson gson = new Gson();
         ArrayList<String> coinsUsed = getCoinsUsed(context);
@@ -581,7 +578,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static String getDatePrefs(Context context){
         return getPrefs(context).getString("Date", "");
     }
-
     public static void setDatePrefs(Context context){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putString("Date", getDate());
@@ -591,15 +587,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static int getNumShil(Context context){
         return getPrefs(context).getInt("Shil", 0);
     }
-
     public static int getNumDolr(Context context){
         return getPrefs(context).getInt("Dolr", 0);
     }
-
     public static int getNumPenny(Context context){
         return getPrefs(context).getInt("Penny", 0);
     }
-
     public static int getNumQuid(Context context){
         return getPrefs(context).getInt("Quid", 0);
     }
@@ -640,42 +633,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putInt("Quid", num+actual);
         editor.commit();
     }
-
-    public static void subQuid(Context context, int num){
-        int actual = getNumQuid(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Quid", -num+actual);
-        editor.commit();
-    }
-
     public static void addDolr(Context context, int num){
         int actual = getNumDolr(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Dolr", num+actual);
         editor.commit();
     }
-
-    public static void subDolr(Context context, int num){
-        int actual = getNumDolr(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Dolr", -num+actual);
-        editor.commit();
-    }
-
     public static void addPenny(Context context, int num){
         int actual = getNumPenny(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Penny", num+actual);
         editor.commit();
     }
-
-    public static void subPenny(Context context, int num){
-        int actual = getNumPenny(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Penny", -num+actual);
-        editor.commit();
-    }
-
     public static void addShil(Context context, int num){
         int actual = getNumShil(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -689,13 +658,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putInt("Shil", -num+actual);
         editor.commit();
     }
+    public static void subQuid(Context context, int num){
+        int actual = getNumQuid(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Quid", -num+actual);
+        editor.commit();
+    }
+    public static void subDolr(Context context, int num){
+        int actual = getNumDolr(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Dolr", -num+actual);
+        editor.commit();
+    }
+    public static void subPenny(Context context, int num){
+        int actual = getNumPenny(context);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("Penny", -num+actual);
+        editor.commit();
+    }
 
     public static int getNumShilFriends(Context context){ return getPrefs(context).getInt("ShilFriends", 0);}
-
     public static int getNumDolrFriends(Context context){ return getPrefs(context).getInt("DolrFriends", 0); }
-
     public static int getNumQuidFriends(Context context){ return getPrefs(context).getInt("QuidFriends", 0); }
-
     public static int getNumPennyFriends(Context context){ return getPrefs(context).getInt("PennyFriends", 0); }
 
     public static void addQuidFriends(Context context, int num){
@@ -704,21 +688,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putInt("QuidFriends", num+actual);
         editor.commit();
     }
-
     public static void addDolrFriends(Context context, int num){
         int actual = getNumDolrFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("DolrFriends", num+actual);
         editor.commit();
     }
-
     public static void addShilFriends(Context context, int num){
         int actual = getNumShilFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("ShilFriends", num+actual);
         editor.commit();
     }
-
     public static void addPennyFriends(Context context, int num){
         int actual = getNumPennyFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -732,21 +713,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putInt("QuidFriends", -num+actual);
         editor.commit();
     }
-
     public static void subDolrFriends(Context context, int num){
         int actual = getNumDolrFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("DolrFriends", -num+actual);
         editor.commit();
     }
-
     public static void subShilFriends(Context context, int num){
         int actual = getNumShilFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("ShilFriends", -num+actual);
         editor.commit();
     }
-
     public static void subPennyFriends(Context context, int num){
         int actual = getNumPennyFriends(context);
         SharedPreferences.Editor editor = getPrefs(context).edit();
@@ -797,7 +775,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         HashMap<String, String[]> coinsFriends = gson.fromJson(storedHashMapString, type);
         return coinsFriends;
     }
-
     public static void setCoinsOverallFriends(Context context, HashMap<String, String[]> coinsOverallFriends){
         String TAG = "setCoinsOverallFriends";
         Log.d(TAG, "Setting the overall friends coins");
@@ -807,7 +784,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.putString("coinsFriends", hashCoinsStr);
         editor.commit();
     }
-
     public static void addCoinsFriends(Context context, String id, String rate, String currency){
         String TAG = "addCoinsFriends";
         Log.d(TAG, "Adding coin " + id);
@@ -872,7 +848,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Reset the variables that need to be reseted depending on the date, like coins that have been picked up that day or goals.
     public static void resetVariables(Context context){
-        
+        Bank.resetCoinsCashed(context);
     }
 
     //Code from https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi

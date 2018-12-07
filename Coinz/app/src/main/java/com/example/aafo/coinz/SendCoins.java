@@ -3,6 +3,7 @@ package com.example.aafo.coinz;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -53,8 +54,6 @@ public class SendCoins extends AppCompatActivity {
         displayChosenQuid();
 
         emailToSend = (EditText) findViewById(R.id.email_to_send);
-
-
     }
 
     public void sendQuid(View view){
@@ -64,11 +63,10 @@ public class SendCoins extends AppCompatActivity {
             return;
         }
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
-        //Map<String, String[]> coinsToSend = new HashMap<String, String[]>();
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
+
         //Getting the coins that the user has
         HashMap<String, String[]> coinsOverall = MainActivity.getCoinsOverall(SendCoins.this);
         int numQuid = MainActivity.getNumQuid(SendCoins.this);
@@ -80,7 +78,6 @@ public class SendCoins extends AppCompatActivity {
             for (int i = 0; i <quidCount; i++) {
                 String id = keys.get(i);
                 String[] charact = quidHash.get(id);
-                //coinsToSend.put(keys.get(i), quidHash.get(keys.get(i)));
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
 
                 Gson gson = new Gson();
@@ -110,6 +107,10 @@ public class SendCoins extends AppCompatActivity {
                     }
                 });
             }
+            setNumCoinsSent(SendCoins.this, quidCount);
+            if(Medals.checkGoals(SendCoins.this)){
+                Toast.makeText(SendCoins.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+            }
         }
         else{
             notEnough(SendCoins.this);
@@ -123,11 +124,10 @@ public class SendCoins extends AppCompatActivity {
             return;
         }
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
-        //Map<String, String[]> coinsToSend = new HashMap<String, String[]>();
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
+
         //Getting the coins that the user has
         HashMap<String, String[]> coinsOverall = MainActivity.getCoinsOverall(SendCoins.this);
         int numShil = MainActivity.getNumShil(SendCoins.this);
@@ -166,6 +166,10 @@ public class SendCoins extends AppCompatActivity {
                                 Log.d("Send coin", e.toString());
                             }
                         });
+            }
+            setNumCoinsSent(SendCoins.this, shilCount);
+            if(Medals.checkGoals(SendCoins.this)){
+                Toast.makeText(SendCoins.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
             }
         }
         else{
@@ -224,6 +228,10 @@ public class SendCoins extends AppCompatActivity {
                             }
                         });
             }
+            setNumCoinsSent(SendCoins.this, dolrCount);
+            if(Medals.checkGoals(SendCoins.this)){
+                Toast.makeText(SendCoins.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+            }
         }
         else{
             notEnough(SendCoins.this);
@@ -281,6 +289,10 @@ public class SendCoins extends AppCompatActivity {
                                 Log.d("Send coin", e.toString());
                             }
                         });
+            }
+            setNumCoinsSent(SendCoins.this, penyCount);
+            if(Medals.checkGoals(SendCoins.this)){
+                Toast.makeText(SendCoins.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
             }
         }
         else{
@@ -371,5 +383,21 @@ public class SendCoins extends AppCompatActivity {
             dolrCount--;
         }
         displayChosenDolr();
+    }
+
+    private static String PREF_NAME = "preferences";
+    private static SharedPreferences getPrefs(Context context){
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static void setNumCoinsSent(Context context, int sent){
+        int sentBefore = getNumCoinsSent(context);
+        sent = sentBefore+sent;
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("sentCoins", sent);
+        editor.commit();
+    }
+    public static int getNumCoinsSent(Context context){
+        return getPrefs(context).getInt("sentCoins", 0);
     }
 }

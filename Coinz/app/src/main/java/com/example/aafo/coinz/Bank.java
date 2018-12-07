@@ -157,10 +157,9 @@ public class Bank extends AppCompatActivity {
             ArrayList<String> keys = new ArrayList(quidHash.keySet());
 
             HashMap<String, String[]> quidHashFriends = MainActivity.coinsQuidFriends;
-            Log.d(TAG, "Size quidFriends: " + quidHash.size()); //If this is 0, check the saving, maybe it is being saved wrong, update sharedpreferences
+            Log.d(TAG, "Size quidFriends: " + quidHash.size());
             ArrayList<String> keysFriends = new ArrayList(quidHashFriends.keySet());
 
-            //TODO get also the quid from friends for the keys! It is empty when cashing just from friends.
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numQuid >= quidCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=quidCount){
@@ -180,7 +179,7 @@ public class Bank extends AppCompatActivity {
             else if(quidCount<(25-getCoinsCashed(Bank.this))){
                 Log.d(TAG, "Cashing quid from both types of coins");
                 //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4 from own and 1 from friends
-                int quidToCash = Math.min(25-getCoinsCashed(Bank.this), quidCount);
+                int quidToCash = Math.min(25-getCoinsCashed(Bank.this), numQuid);
                 int quidFromFr = quidCount-quidToCash;
                 cashFromOwn(Bank.this, quidToCash, used, keys, coinsOverall, quidHash, "QUID");
                 cashFromFriends(Bank.this, quidFromFr, used, keys, coinsFriends, quidHash, "QUID");
@@ -213,8 +212,13 @@ public class Bank extends AppCompatActivity {
 
             //Make sure that the coins are up to date
             MainActivity.setCoins(Bank.this);
+            MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> dolrHash = MainActivity.coinsDolr;
             ArrayList<String> keys = new ArrayList(dolrHash.keySet());
+
+            HashMap<String, String[]> dolrHashFriends = MainActivity.coinsDolrFriends;
+            Log.d(TAG, "Size dolrFriends: " + dolrHash.size());
+            ArrayList<String> keysFriends = new ArrayList(dolrHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numDolr >= dolrCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=dolrCount){
@@ -227,17 +231,17 @@ public class Bank extends AppCompatActivity {
             else if(numDolrFr>=dolrCount && (getCoinsCashed(Bank.this)>=25|numDolr==0)){
                 Log.d(TAG, "Cashing dolr from friends' coins");
                 //Cash the coins from the user
-                cashFromFriends(Bank.this, dolrCount, used, keys, coinsFriends, dolrHash, "DOLR");
+                cashFromFriends(Bank.this, dolrCount, used, keysFriends, coinsFriends, dolrHashFriends, "DOLR");
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
             else if(dolrCount<(25-getCoinsCashed(Bank.this))){
                 Log.d(TAG, "Cashing dolr from own and friends'");
                 //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4
-                int dolrToCash = Math.min(25-getCoinsCashed(Bank.this), dolrCount);
+                int dolrToCash = Math.min(25-getCoinsCashed(Bank.this), numDolr);
                 int dolrFromFr = dolrCount-dolrToCash;
                 cashFromOwn(Bank.this, dolrToCash, used, keys, coinsOverall, dolrHash, "DOLR");
-                cashFromFriends(Bank.this, dolrFromFr, used, keys, coinsFriends, dolrHash, "DOLR");
+                cashFromFriends(Bank.this, dolrFromFr, used, keysFriends, coinsFriends, dolrHashFriends, "DOLR");
             }
 
             displayInfo();
@@ -267,8 +271,13 @@ public class Bank extends AppCompatActivity {
 
             //Make sure that the coins are up to date
             MainActivity.setCoins(Bank.this);
+            MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> penyHash = MainActivity.coinsPeny;
             ArrayList<String> keys = new ArrayList(penyHash.keySet());
+
+            HashMap<String, String[]> penyHashFriends = MainActivity.coinsPenyFriends;
+            Log.d(TAG, "Size penyFriends: " + penyHash.size());
+            ArrayList<String> keysFriends = new ArrayList(penyHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numPeny >= penyCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=penyCount){
@@ -281,17 +290,17 @@ public class Bank extends AppCompatActivity {
             else if(numPenyFr>=penyCount && (getCoinsCashed(Bank.this)>=25|numPeny==0)){
                 Log.d(TAG, "Cashing peny from friends");
                 //Cash the coins from the user
-                cashFromFriends(Bank.this, penyCount, used, keys, coinsFriends, penyHash, "PENY");
+                cashFromFriends(Bank.this, penyCount, used, keysFriends, coinsFriends, penyHashFriends, "PENY");
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
             else if(penyCount<(25-getCoinsCashed(Bank.this))){
                 Log.d(TAG, "Cashing dolr from both");
                 //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4
-                int penyToCash = Math.min(25-getCoinsCashed(Bank.this), penyCount);
+                int penyToCash = Math.min(25-getCoinsCashed(Bank.this), numPeny);
                 int penyFromFr = penyCount-penyToCash;
                 cashFromOwn(Bank.this, penyToCash, used, keys, coinsOverall, penyHash, "PENY");
-                cashFromFriends(Bank.this, penyFromFr, used, keys, coinsFriends, penyHash, "PENY");
+                cashFromFriends(Bank.this, penyFromFr, used, keysFriends, coinsFriends, penyHashFriends, "PENY");
             }
 
             displayInfo();
@@ -321,8 +330,13 @@ public class Bank extends AppCompatActivity {
 
             //Make sure that the coins are up to date
             MainActivity.setCoins(Bank.this);
+            MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> shilHash = MainActivity.coinsShil;
             ArrayList<String> keys = new ArrayList(shilHash.keySet());
+
+            HashMap<String, String[]> shilHashFriends = MainActivity.coinsShilFriends;
+            Log.d(TAG, "Size shilFriends: " + shilHash.size());
+            ArrayList<String> keysFriends = new ArrayList(shilHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numShil >= shilCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=shilCount){
@@ -335,17 +349,17 @@ public class Bank extends AppCompatActivity {
             else if(numShilFr>=shilCount && (getCoinsCashed(Bank.this)>=25|numShil==0)){
                 Log.d(TAG, "Cashing shil from friends");
                 //Cash the coins from the user
-                cashFromFriends(Bank.this, shilCount, used, keys, coinsFriends, shilHash, "SHIL");
+                cashFromFriends(Bank.this, shilCount, used, keysFriends, coinsFriends, shilHashFriends, "SHIL");
             }
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
             else if(shilCount<(25-getCoinsCashed(Bank.this))){
                 Log.d(TAG, "Cashing shil from own and friends");
                 //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4
-                int shilToCash = Math.min(25-getCoinsCashed(Bank.this), shilCount);
+                int shilToCash = Math.min(25-getCoinsCashed(Bank.this), numShil);
                 int shilFromFr = shilCount-shilToCash;
                 cashFromOwn(Bank.this, shilToCash, used, keys, coinsOverall, shilHash, "SHIL");
-                cashFromFriends(Bank.this, shilFromFr, used, keys, coinsFriends, shilHash, "SHIL");
+                cashFromFriends(Bank.this, shilFromFr, used, keysFriends, coinsFriends, shilHashFriends, "SHIL");
             }
 
             displayInfo();
@@ -366,7 +380,7 @@ public class Bank extends AppCompatActivity {
             Log.d(TAG, "Size of used: " + used.size());
             //If the coin has not been cashed before, cash it
             if(!(used.contains(keys.get(i)))){
-                Log.d(TAG, "Cashing coin " + i + "/" + amount);
+                Log.d(TAG, "Cashing coin " + (i+1) + "/" + amount);
                 float rate = MainActivity.ratesHash.get(currency);
                 float value = Float.parseFloat(coinsHash.get(keys.get(i))[0]);
                 goldToAdd = goldToAdd + (rate*value);
@@ -419,6 +433,9 @@ public class Bank extends AppCompatActivity {
         if(alreadyCashed>0){alreadyCashed(context, alreadyCashed);}
 
         addGold(context, goldToAdd);
+        if(Medals.checkGoals(context)){
+            Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void cashFromOwn(Context context, int amount, ArrayList<String> used,ArrayList<String> keys, HashMap<String, String[]> coinsOverall, HashMap<String, String[]> coinHash, String currency ){
@@ -428,7 +445,7 @@ public class Bank extends AppCompatActivity {
         int alreadyCashed = 0;
         double goldToAdd =0;
         for (int i =0; i<amount; i++) {
-            Log.d(TAG, "Cashing coin " + i + "/" + amount);
+            Log.d(TAG, "Cashing coin " + (i+1) + "/" + amount);
             //If the coin has not been cashed before, cash it
             if (!(used.contains(keys.get(i)))) {
                 float rate = MainActivity.ratesHash.get(currency);
@@ -483,6 +500,9 @@ public class Bank extends AppCompatActivity {
         if(alreadyCashed>0){alreadyCashed(context, alreadyCashed);}
 
         addGold(context, goldToAdd);
+        if(Medals.checkGoals(context)){
+            Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void notEnough(Context context){
@@ -521,6 +541,8 @@ public class Bank extends AppCompatActivity {
     private static SharedPreferences getPrefs(Context context){
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
+
+    //Methods for keeping track and restarting the coins that have been cashed in the day.
     public static void addCoinsCashed(Context context, int amount){
         int cashed = getPrefs(context).getInt("CashedToday", 0);
         cashed = cashed+amount;
@@ -528,7 +550,19 @@ public class Bank extends AppCompatActivity {
         editor.putInt("CashedToday", cashed);
         editor.commit();
     }
-
     public static int getCoinsCashed (Context context){return getPrefs(context).getInt("CashedToday", 0);}
+    public static void resetCoinsCashed(Context context){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("CashedToday", 0);
+        editor.commit();
+    }
 
+    public static void setCoinsCashedTotal(Context context, int amount){
+        int cashed = getPrefs(context).getInt("CashedTotal", 0);
+        cashed = cashed+amount;
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("CashedTotal", cashed);
+        editor.commit();
+    }
+    public static int getCoinsCashedTotal(Context context){return getPrefs(context).getInt("CashedTotal", 0);}
 }
