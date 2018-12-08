@@ -13,8 +13,16 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
     <string name="email">email</string>
+    <string name="bank_explanation">Welcome to the bank! Here you can cash your coins and get some gold for them. As you will see, at the top of the screen there is a
+        display that shows the exchange rates of the coins and how much gold you have. Below, you can see how many coins you have picked up and you have received from
+        your friends. Just use the + and - buttons to choose how many coins you want to exchange and then press OK! Keep in mind that you can only cash 25 coins from
+        your own per day. But do not worry! Even if you have cashed those 25, you can keep cashing the ones your friends have sent you! And the system does it all for
+        you!</string>
+    <string name="achievements_explanation">These are the achievements! Life would be boring without goals, so here are some goals for you to complete while playing.
+        Whenever you complete one, you will see a small message telling you that you have achieved a goal. Just come back here and check which has turned green, and that
+        is your new achievement! Have fun completing them!</string>
+    <string name="news_explanation">Welcome to the newsstand! Here you can read what has happened for the exchange rates to be like they are. There are four news per
+        day. The first one is free, but for reading the others you will need to pay 500 gold each, the reporters need a salary.</string>
+    <string name="send_explanation">You found the social screen! From here you can send coins to your friends and get the ones that they send to you</string>
 </resources>
