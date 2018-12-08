@@ -1,6 +1,8 @@
 package com.example.aafo.coinz;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -80,22 +82,22 @@ public class SendFriends extends AppCompatActivity {
 
                         //Set the appropriate variable depending on the currency
                         if(curr.equals("QUID")){
-                            MainActivity.addQuidFriends(SendFriends.this, 1);
+                            //MainActivity.addQuidFriends(SendFriends.this, 1);
                             int added = newCoins.get("Quid") +1;
                             newCoins.put("Quid", added);
                         }
                         else if(curr.equals("DOLR")){
-                            MainActivity.addDolrFriends(SendFriends.this, 1);
+                            //MainActivity.addDolrFriends(SendFriends.this, 1);
                             int added = newCoins.get("Dollar") +1;
                             newCoins.put("Dollar", added);
                         }
                         else if(curr.equals("PENY")){
-                            MainActivity.addPennyFriends(SendFriends.this, 1);
+                            //MainActivity.addPennyFriends(SendFriends.this, 1);
                             int added = newCoins.get("Penny") +1;
                             newCoins.put("Penny", added);
                         }
                         else if(curr.equals("SHIL")){
-                            MainActivity.addShilFriends(SendFriends.this, 1);
+                            //MainActivity.addShilFriends(SendFriends.this, 1);
                             int added = newCoins.get("Shilling") +1;
                             newCoins.put("Shilling", added);
                         }
@@ -107,15 +109,21 @@ public class SendFriends extends AppCompatActivity {
 
                     //Write in a string the coins that have been received by the user
                     String toShow = "";
+                    int received = 0;
                     for(String currency : newCoins.keySet()){
                         toShow = toShow + currency + ": " + newCoins.get(currency) + "\n";
+                        received = received+newCoins.get(currency);
                     }
 
                     //Build an alert dialog to tell the user what coins they hae received from friends
                     AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
+                    setNumCoinsReceived(SendFriends.this, received);
                     builder.setMessage(toShow).setTitle("Coins received");
                     AlertDialog dialog = builder.create();
                     dialog.show();
+                    if(Medals.checkGoals(SendFriends.this)){
+                        Toast.makeText(SendFriends.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else{
                     Toast.makeText(SendFriends.this, "No coins were found", Toast.LENGTH_SHORT).show();
@@ -127,5 +135,23 @@ public class SendFriends extends AppCompatActivity {
                 Toast.makeText(SendFriends.this, "The data could not be accessed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private static String PREF_NAME = "preferences";
+    private static SharedPreferences getPrefs(Context context){
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static void setNumCoinsReceived(Context context, int received){
+        Log.d("setNumCoinsReceived", "Adding "+received+" to received coins");
+        int sentBefore = getNumCoinsReceived(context);
+        received = sentBefore+received;
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("receivedCoins", received);
+        editor.commit();
+    }
+    public static int getNumCoinsReceived(Context context){
+        Log.d("getNumCoinsReceived", "Getting the number of coins that have been received");
+        return getPrefs(context).getInt("receivedCoins", 0);
     }
 }

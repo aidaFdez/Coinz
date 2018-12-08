@@ -111,6 +111,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         setDatePrefs(MainActivity.this);
 
+        //If this is the firs time that the app has been opened, set the goals.
+        if(firstTime(MainActivity.this)){
+            Log.d(TAG, "First time the app is opened");
+            Medals.addGoals(MainActivity.this);
+        }
+
+
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -170,11 +177,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id"))) &&
                            !(getPickedCoins(MainActivity.this).contains(properties.getString("id")))){
                             mapboxMap.addMarker(coin);
-                        }else{
-                            //Toast.makeText(MainActivity.this, "Did have it" +i, Toast.LENGTH_LONG).show();
                         }
 
-                        //Code from https://www.mapbox.com/android-docs/maps/overview/annotations/
+                        //Code based on https://www.mapbox.com/android-docs/maps/overview/annotations/
                         mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(@NonNull Marker marker) {
@@ -186,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     double markerLn = markerLtLn.getLongitude();
 
                                     AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
-                                    builderr.setTitle("Wait").setMessage("Pleas wait for the location to load.");
+                                    builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
                                     AlertDialog dialogg = builderr.create();
                                     if(originLocation == null){
                                         dialogg.show();
@@ -196,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
                                         //if(distance<25.0){
                                         AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
-                                        //Toast.makeText(MainActivity.this, "Distance less", Toast.LENGTH_LONG).show();
                                         builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
                                                 .setTitle("Pick up the coin")
                                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -205,22 +209,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                                         //Pick up the coin, so store it in the coins hashmap. Then delete it
                                                         try {
-                                                            //JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
-                                                            //                  .getJSONObject("properties");
                                                             String value = props.getString("value");
                                                             String currency = props.getString("currency");
+                                                            //Save the coin with the others
                                                             addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
-                                                            addCoins(MainActivity.this, currency, 1);
-                                                            //addCoinsSw(MainActivity.this, 1, currency);
+                                                            //Update the text to add the new coin to the counter
                                                             changeText();
                                                             addPickedCoin(MainActivity.this, marker.getSnippet());
+                                                            mapboxMap.removeMarker(marker);
                                                         } catch (JSONException e) {
                                                             Log.e("putInPrefs", ""+e);
                                                         }
-                                                        mapboxMap.removeMarker(marker);
                                                         if(Medals.checkGoals(context)){
                                                             Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
                                                         }
+                                                        //Add one to the total of picked coins
+                                                        setCoinsPicked(context, 1);
+                                                        Log.d(TAG, "Coin picked");
                                                     }
                                                 })
                                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -241,8 +246,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                //AlertDialog dialog = builder.create();
-                                //dialog.show();
                                 return true;
                             }
                         });
@@ -442,34 +445,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int dolr = getNumDolr(context);
         int penny = getNumPenny(context);
         int quid = getNumQuid(context);
-        String toChange = "Shellins: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid+"\nGold: "+getGold(MainActivity.this);
+        String toChange = "Shillings: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid+"\nGold: "+getGold(MainActivity.this);
         final TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(toChange);
     }
 
-    public void addCoins(Context context, String currency, int num){
-        if(currency.equals("SHIL")){
-            addShil(context, num);
-        }
-        if(currency.equals("DOLR")){
-            addDolr(context, num);
-        }
-        if(currency.equals("QUID")){
-            addQuid(context, num);
-        }
-        if(currency.equals("PENY")){
-            addPenny(context, num);
-        }
 
-    }
-
-
-    ////////////////////////////////
-    //                            //
-    // GETTER AND SETTER FUNCTIONS//
-    //   AND SHARED PREFERENCES   //
-    //                            //
-    ////////////////////////////////
+    /////////////////////////////////
+    //                             //
+    // GETTER AND SETTER FUNCTIONS //
+    //   AND SHARED PREFERENCES    //
+    //                             //
+    /////////////////////////////////
 
     //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
     private SharedPreferences sharedPrefs;
@@ -478,6 +465,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static SharedPreferences getPrefs(Context context){
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
+
+    /*******************/
+    /** Coins related **/
+    /**    methods    **/
+    /*******************/
 
     public static void addPickedCoin(Context context, String picked){
         Gson gson = new Gson();
@@ -502,9 +494,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return array;
     }
 
-    public static Float getGold(Context context){
-        return getPrefs(context).getFloat("Gold", 0.0f);
-    }
+    public static Float getGold(Context context){return getPrefs(context).getFloat("Gold", 0.0f);}
     public static void setGold(Context context, Float amount){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putFloat("Gold", amount);
@@ -521,7 +511,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //Code from https://stackoverflow.com/questions/7944601/how-to-save-hashmap-to-shared-preferences
-    //Gson gson = new Gson();
     public static HashMap<String, String[]> getCoinsOverall(Context context){
         Gson gson = new Gson();
         HashMap<String, String[]> empty = new HashMap<String, String[]>();
@@ -584,182 +573,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
-    public static int getNumShil(Context context){
-        return getPrefs(context).getInt("Shil", 0);
-    }
-    public static int getNumDolr(Context context){
-        return getPrefs(context).getInt("Dolr", 0);
-    }
-    public static int getNumPenny(Context context){
-        return getPrefs(context).getInt("Penny", 0);
-    }
-    public static int getNumQuid(Context context){
-        return getPrefs(context).getInt("Quid", 0);
-    }
+    public static int getNumShil(Context context){setCoins(context);return coinsShil.size();}
+    public static int getNumDolr(Context context){setCoins(context);return coinsDolr.size();}
+    public static int getNumPenny(Context context){setCoins(context);return coinsPeny.size();}
+    public static int getNumQuid(Context context){setCoins(context);return coinsQuid.size();}
 
-    public static void addCoinsSw(Context context, int num, String currency){
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        switch(currency){
-            case "QUID":
-                int quids = getNumQuid(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("Quid", num+quids);
-                //editor.commit();
 
-            case "DOLR":
-                int dolrs = getNumDolr(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("Dolr", num+dolrs);
-                //editor.commit();
+    public static int getNumShilFriends(Context context){setCoinsFriends(context);return coinsShilFriends.size();}
+    public static int getNumDolrFriends(Context context){setCoinsFriends(context);return coinsDolrFriends.size();}
+    public static int getNumPennyFriends(Context context){setCoinsFriends(context);return coinsPenyFriends.size();}
+    public static int getNumQuidFriends(Context context){setCoinsFriends(context);return coinsQuidFriends.size();}
 
-            case "PENY":
-                int pennies = getNumPenny(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("Penny", num+pennies);
-                //editor.commit();
-
-            case "SHIL":
-                int shils = getNumShil(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("Shil", num+shils);
-                //editor.commit();
-        }
-        editor.commit();
-    }
-
-    public static void addQuid(Context context, int num){
-        int actual = getNumQuid(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Quid", num+actual);
-        editor.commit();
-    }
-    public static void addDolr(Context context, int num){
-        int actual = getNumDolr(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Dolr", num+actual);
-        editor.commit();
-    }
-    public static void addPenny(Context context, int num){
-        int actual = getNumPenny(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Penny", num+actual);
-        editor.commit();
-    }
-    public static void addShil(Context context, int num){
-        int actual = getNumShil(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Shil", num+actual);
-        editor.commit();
-    }
-
-    public static void subShil(Context context, int num){
-        int actual = getNumShil(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Shil", -num+actual);
-        editor.commit();
-    }
-    public static void subQuid(Context context, int num){
-        int actual = getNumQuid(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Quid", -num+actual);
-        editor.commit();
-    }
-    public static void subDolr(Context context, int num){
-        int actual = getNumDolr(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Dolr", -num+actual);
-        editor.commit();
-    }
-    public static void subPenny(Context context, int num){
-        int actual = getNumPenny(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("Penny", -num+actual);
-        editor.commit();
-    }
-
-    public static int getNumShilFriends(Context context){ return getPrefs(context).getInt("ShilFriends", 0);}
-    public static int getNumDolrFriends(Context context){ return getPrefs(context).getInt("DolrFriends", 0); }
-    public static int getNumQuidFriends(Context context){ return getPrefs(context).getInt("QuidFriends", 0); }
-    public static int getNumPennyFriends(Context context){ return getPrefs(context).getInt("PennyFriends", 0); }
-
-    public static void addQuidFriends(Context context, int num){
-        int actual = getNumQuidFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("QuidFriends", num+actual);
-        editor.commit();
-    }
-    public static void addDolrFriends(Context context, int num){
-        int actual = getNumDolrFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("DolrFriends", num+actual);
-        editor.commit();
-    }
-    public static void addShilFriends(Context context, int num){
-        int actual = getNumShilFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("ShilFriends", num+actual);
-        editor.commit();
-    }
-    public static void addPennyFriends(Context context, int num){
-        int actual = getNumPennyFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("PennyFriends", num+actual);
-        editor.commit();
-    }
-
-    public static void subQuidFriends(Context context, int num){
-        int actual = getNumQuidFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("QuidFriends", -num+actual);
-        editor.commit();
-    }
-    public static void subDolrFriends(Context context, int num){
-        int actual = getNumDolrFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("DolrFriends", -num+actual);
-        editor.commit();
-    }
-    public static void subShilFriends(Context context, int num){
-        int actual = getNumShilFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("ShilFriends", -num+actual);
-        editor.commit();
-    }
-    public static void subPennyFriends(Context context, int num){
-        int actual = getNumPennyFriends(context);
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        editor.putInt("PennyFriends", -num+actual);
-        editor.commit();
-    }
-
-    public static void subCoinsFriends(Context context, int num, String currency){
-        SharedPreferences.Editor editor = getPrefs(context).edit();
-        switch(currency){
-            case "QUID":
-                int quids = getNumQuidFriends(context);
-                editor.putInt("QuidFriends", -num+quids);
-                editor.commit();
-
-            case "DOLR":
-                int dlrs = getNumDolrFriends(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("DolrFriends", -num+dlrs);
-                editor.commit();
-
-            case "SHIL":
-                int shils = getNumShilFriends(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("ShilFriends", -num+shils);
-                editor.commit();
-
-            case "PENY":
-                int pennies = getNumPennyFriends(context);
-                //SharedPreferences.Editor editor = getPrefs(context).edit();
-                editor.putInt("PennyFriends", -num+pennies);
-                editor.commit();
-        }
-
-    }
 
     public static HashMap<String, String[]> getCoinsFriends(Context context){
         Gson gson = new Gson();
@@ -846,10 +670,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+
+    /*******************/
+    /** Other methods **/
+    /*******************/
+
+    //Check if it is the first time that the user opens the app (after login in)
+    public static boolean firstTime(Context context){
+        boolean ret = getPrefs(context).getBoolean("FirstTimeApp", true);
+        if (ret){
+            SharedPreferences.Editor editor = getPrefs(context).edit();
+            editor.putBoolean("FirstTimeApp", false);
+            editor.commit();
+        }
+        return ret;
+    }
+
     //Reset the variables that need to be reseted depending on the date, like coins that have been picked up that day or goals.
     public static void resetVariables(Context context){
         Bank.resetCoinsCashed(context);
+
     }
+
+    public static int getNumCoinsPicked(Context context){ return getPrefs(context).getInt("coinsPickedTotal", 0);}
+    public static void setCoinsPicked(Context context, int newPicked){
+        int alreadyPicked = getNumCoinsPicked(context);
+        alreadyPicked = alreadyPicked+newPicked;
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putInt("coinsPickedTotal", alreadyPicked);
+        editor.commit();
+    }
+
+
 
     //Code from https://stackoverflow.com/questions/3694380/calculating-distance-between-two-points-using-latitude-longitude-what-am-i-doi
     /**

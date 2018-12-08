@@ -49,7 +49,7 @@ public class Bank extends AppCompatActivity {
                             + "\nShilling rate: " + ratesHash.get("SHIL").toString()
                             + "\nQuid rate: " + ratesHash.get("QUID").toString()
                             + "\nGold stored: "+MainActivity.getGold(Bank.this);
-        Toast.makeText(Bank.this, toChange, Toast.LENGTH_LONG).show();
+        //Toast.makeText(Bank.this, toChange, Toast.LENGTH_LONG).show();
         textView.setText(toChange);
     }
 
@@ -280,7 +280,7 @@ public class Bank extends AppCompatActivity {
             ArrayList<String> keysFriends = new ArrayList(penyHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
-            if(numPeny >= penyCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=penyCount){
+            if(numPeny >= penyCount && getCoinsCashed(Bank.this)<25 &&((25-getCoinsCashed(Bank.this))<=penyCount)){
                 Log.d(TAG, "Cashing peny from own");
                 //Cash the coins from the own ones collected
                 cashFromOwn(Bank.this, penyCount, used, keys, coinsOverall, penyHash, "PENY");
@@ -295,7 +295,7 @@ public class Bank extends AppCompatActivity {
 
             //If the user can cash the coins, but has to use from both the friend's and own coins
             else if(penyCount<(25-getCoinsCashed(Bank.this))){
-                Log.d(TAG, "Cashing dolr from both");
+                Log.d(TAG, "Cashing peny from both");
                 //Get the number of quid that can be cashed. If the user has 5 quid but only 4 coins are left, then take 4
                 int penyToCash = Math.min(25-getCoinsCashed(Bank.this), numPeny);
                 int penyFromFr = penyCount-penyToCash;
@@ -390,19 +390,19 @@ public class Bank extends AppCompatActivity {
 
                 if (currency.equals("QUID")){
                     MainActivity.coinsQuidFriends.remove(keys.get(i));
-                    MainActivity.subQuidFriends(context, 1);
+                    //MainActivity.subQuidFriends(context, 1);
                 }
                 if (currency.equals("DOLR")){
                     MainActivity.coinsDolrFriends.remove(keys.get(i));
-                    MainActivity.subDolrFriends(context, 1);
+                    //MainActivity.subDolrFriends(context, 1);
                 }
                 if(currency.equals("PENY")){
                     MainActivity.coinsPenyFriends.remove(keys.get(i));
-                    MainActivity.subPennyFriends(context, 1);
+                    //MainActivity.subPennyFriends(context, 1);
                 }
                 if(currency.equals("SHIL")){
                     MainActivity.coinsShilFriends.remove(keys.get(i));
-                    MainActivity.subShilFriends(context, 1);
+                    //MainActivity.subShilFriends(context, 1);
                 }
                 //Update the coins
                 MainActivity.setCoinsFriends(context);
@@ -412,25 +412,26 @@ public class Bank extends AppCompatActivity {
                 coinsOverallFriends.remove(keys.get(i));
                 MainActivity.setCoinsOverallFriends(context, coinsOverallFriends);
                 if(currency.equals("QUID")){
-                    MainActivity.subQuidFriends(context, 1);
+                    //MainActivity.subQuidFriends(context, 1);
                     MainActivity.coinsQuidFriends.remove(keys.get(i));
                 }
                 if(currency.equals("DOLR")){
-                    MainActivity.subDolrFriends(context, 1);
-                    MainActivity.subDolrFriends(context, 1);
+                    //MainActivity.subDolrFriends(context, 1);
+                    MainActivity.coinsDolrFriends.remove(keys.get(i));
                 }
                 if(currency.equals("PENY")){
                     MainActivity.coinsPenyFriends.remove(keys.get(i));
-                    MainActivity.subPennyFriends(context, 1);
+                    //MainActivity.subPennyFriends(context, 1);
                 }
                 if(currency.equals("SHIL")){
                     MainActivity.coinsShilFriends.remove(keys.get(i));
-                    MainActivity.subShilFriends(context, 1);
+                    //MainActivity.subShilFriends(context, 1);
                 }
                 MainActivity.setCoinsFriends(context);
             }
         }
         if(alreadyCashed>0){alreadyCashed(context, alreadyCashed);}
+        setCoinsCashedTotal(context, amount-alreadyCashed);
 
         addGold(context, goldToAdd);
         if(Medals.checkGoals(context)){
@@ -456,19 +457,19 @@ public class Bank extends AppCompatActivity {
                 MainActivity.setCoinsOverall(context, coinsOverall);
                 if (currency.equals("QUID")){
                     MainActivity.coinsQuid.remove(keys.get(i));
-                    MainActivity.subQuid(context, 1);
+                    //MainActivity.subQuid(context, 1);
                 }
                 if (currency.equals("DOLR")){
                     MainActivity.coinsDolr.remove(keys.get(i));
-                    MainActivity.subDolr(context, 1);
+                    //MainActivity.subDolr(context, 1);
                 }
                 if(currency.equals("PENY")){
                     MainActivity.coinsPeny.remove(keys.get(i));
-                    MainActivity.subPenny(context, 1);
+                    //MainActivity.subPenny(context, 1);
                 }
                 if(currency.equals("SHIL")){
                     MainActivity.coinsShil.remove(keys.get(i));
-                    MainActivity.subShil(context, 1);
+                    //MainActivity.subShil(context, 1);
                 }
                 //Update the coins
                 MainActivity.setCoins(context);
@@ -479,24 +480,25 @@ public class Bank extends AppCompatActivity {
                 coinsOverall.remove(keys.get(i));
                 MainActivity.setCoinsOverall(context, coinsOverall);
                 if(currency.equals("QUID")){
-                    MainActivity.subQuid(context, 1);
+                    //MainActivity.subQuid(context, 1);
                     MainActivity.coinsQuid.remove(keys.get(i));
                 }
                 if(currency.equals("DOLR")){
-                    MainActivity.subDolr(context, 1);
-                    MainActivity.subDolr(context, 1);
+                    //MainActivity.subDolr(context, 1);
+                    MainActivity.coinsDolr.remove(keys.get(i));
                 }
                 if(currency.equals("PENY")){
                     MainActivity.coinsPeny.remove(keys.get(i));
-                    MainActivity.subPenny(context, 1);
+                    //MainActivity.subPenny(context, 1);
                 }
                 if(currency.equals("SHIL")){
                     MainActivity.coinsShil.remove(keys.get(i));
-                    MainActivity.subShil(context, 1);
+                    //MainActivity.subShil(context, 1);
                 }
                 MainActivity.setCoins(context);
             }
         }
+        setCoinsCashedTotal(context, amount-alreadyCashed);
         if(alreadyCashed>0){alreadyCashed(context, alreadyCashed);}
 
         addGold(context, goldToAdd);

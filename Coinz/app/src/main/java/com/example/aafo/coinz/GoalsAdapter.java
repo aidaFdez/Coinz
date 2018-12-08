@@ -60,9 +60,9 @@ public class GoalsAdapter extends RecyclerView.Adapter<GoalsAdapter.ViewHolder>{
 
         //If the goal has been achieved, then set it's background to green. Red otherwise.
         if(goal.getAchieved()){
-            textView.setBackgroundColor(Color.GREEN);
+            textView.setBackgroundColor(Color.parseColor("#0F9F5F"));
         }else{
-            textView.setBackgroundColor(Color.RED);
+            textView.setBackgroundColor(Color.parseColor("#EC3B3B"));
         }
         TextView textview = holder.descrTextview;
         textview.setText(goal.getDescription());

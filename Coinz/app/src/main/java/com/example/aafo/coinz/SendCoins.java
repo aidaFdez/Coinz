@@ -16,9 +16,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ public class SendCoins extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        //displayInfo();
         displayDolr();
         displayPenny();
         displayQuid();
@@ -58,11 +56,21 @@ public class SendCoins extends AppCompatActivity {
 
     public void sendQuid(View view){
         String emailString = emailToSend.getText().toString().trim();
+
+
+        //Show a toast if the user has not inputted any email
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
             return;
         }
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+
+        //If the user tries to send coins to themselves, do not allow it, show a toast
+        FirebaseUser user = mAuth.getCurrentUser();
+        String emailUser = user.getEmail();
+        if(emailString.equals(emailUser)){
+            Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
@@ -80,8 +88,6 @@ public class SendCoins extends AppCompatActivity {
                 String[] charact = quidHash.get(id);
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
 
-                Gson gson = new Gson();
-                String arraySendStr = gson.toJson(charact);
                 int index = i;
 
                 Map<String, String> map = new HashMap<String, String>();
@@ -93,7 +99,6 @@ public class SendCoins extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         MainActivity.coinsQuid.remove(keys.get(index));
-                        MainActivity.subQuid(SendCoins.this, 1);
                         coinsOverall.remove(keys.get(index));
                         Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
                         displayQuid();
@@ -123,7 +128,14 @@ public class SendCoins extends AppCompatActivity {
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
             return;
         }
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+
+        //If the user tries to send coins to themselves, do not allow it, show a toast
+        FirebaseUser user = mAuth.getCurrentUser();
+        String emailUser = user.getEmail();
+        if(emailString.equals(emailUser)){
+            Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
@@ -141,8 +153,6 @@ public class SendCoins extends AppCompatActivity {
                 String[] charact = shilHash.get(id);
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
 
-                Gson gson = new Gson();
-                String arraySendStr = gson.toJson(charact);
                 int index = i;
 
                 Map<String, String> map = new HashMap<String, String>();
@@ -153,7 +163,6 @@ public class SendCoins extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsShil.remove(keys.get(index));
-                                MainActivity.subShil(SendCoins.this, 1);
                                 coinsOverall.remove(keys.get(index));
                                 Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
                                 displayShil();
@@ -183,12 +192,18 @@ public class SendCoins extends AppCompatActivity {
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
             return;
         }
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
-        //Map<String, String[]> coinsToSend = new HashMap<String, String[]>();
+
+        //If the user tries to send coins to themselves, do not allow it, show a toast
+        FirebaseUser user = mAuth.getCurrentUser();
+        String emailUser = user.getEmail();
+        if(emailString.equals(emailUser)){
+            Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
+
         //Getting the coins that the user has
         HashMap<String, String[]> coinsOverall = MainActivity.getCoinsOverall(SendCoins.this);
         int numDolr = MainActivity.getNumDolr(SendCoins.this);
@@ -202,8 +217,6 @@ public class SendCoins extends AppCompatActivity {
                 String[] charact = dolrHash.get(id);
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
 
-                Gson gson = new Gson();
-                String arraySendStr = gson.toJson(charact);
                 int index = i;
 
                 Map<String, String> map = new HashMap<String, String>();
@@ -214,7 +227,6 @@ public class SendCoins extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsDolr.remove(keys.get(index));
-                                MainActivity.subDolr(SendCoins.this, 1);
                                 coinsOverall.remove(keys.get(index));
                                 Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
                                 displayDolr();
@@ -244,12 +256,18 @@ public class SendCoins extends AppCompatActivity {
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
             return;
         }
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        //DatabaseReference ref = firebaseDatabase.getReference(mAuth.getUid());
-        //Map<String, String[]> coinsToSend = new HashMap<String, String[]>();
+
+        //If the user tries to send coins to themselves, do not allow it, show a toast
+        FirebaseUser user = mAuth.getCurrentUser();
+        String emailUser = user.getEmail();
+        if(emailString.equals(emailUser)){
+            Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
+
         //Getting the coins that the user has
         HashMap<String, String[]> coinsOverall = MainActivity.getCoinsOverall(SendCoins.this);
         int numPenny = MainActivity.getNumPenny(SendCoins.this);
@@ -261,11 +279,8 @@ public class SendCoins extends AppCompatActivity {
             for (int i = 0; i <penyCount; i++) {
                 String id = keys.get(i);
                 String[] charact = penyHash.get(id);
-                //coinsToSend.put(keys.get(i), quidHash.get(keys.get(i)));
                 MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
 
-                Gson gson = new Gson();
-                String arraySendStr = gson.toJson(charact);
                 int index = i;
 
                 Map<String, String> map = new HashMap<String, String>();
@@ -276,7 +291,6 @@ public class SendCoins extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsPeny.remove(keys.get(index));
-                                MainActivity.subPenny(SendCoins.this, 1);
                                 coinsOverall.remove(keys.get(index));
                                 Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
                                 displayPenny();

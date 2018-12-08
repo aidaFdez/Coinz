@@ -2,6 +2,7 @@ package com.example.aafo.coinz;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -32,19 +33,19 @@ public class Goal {
 
     public static Goal[] getGoals(Context context){
         Gson gson = new Gson();
-        ArrayList<Goal> empty = new ArrayList<Goal>();
-        empty.add(0, new Goal("", ""));
+        Goal[] empty = new Goal[]{ new Goal("", "")};
         String storedArrayString = getPrefs(context).getString("goals", "");
-        java.lang.reflect.Type type = new TypeToken<ArrayList<Goal>>(){}.getType();
+        java.lang.reflect.Type type = new TypeToken<Goal[]>(){}.getType();
         //If there is no stored array, then return an empty array
         if (storedArrayString.equals("")){
-            return empty.toArray(new Goal[empty.size()]);
+            return empty/*.toArray(new Goal[empty.size()])*/;
         }
         //Transform the string into an array and return it
-        ArrayList<Goal> goals = gson.fromJson(storedArrayString, type);
-        return goals.toArray(new Goal[goals.size()]);
+        Goal[] goals = gson.fromJson(storedArrayString, type);
+        return goals/*.toArray(new Goal[goals.size()])*/;
     }
-    public static void setGoals(Context context, ArrayList<Goal> goals){
+    public static void setGoals(Context context, Goal[] goals){
+        Log.d("setGoals", "Committing the goals to the sharedPrefs");
         Gson gson = new Gson();
         String hashGoalsStr = gson.toJson(goals);
         SharedPreferences.Editor editor = getPrefs(context).edit();
