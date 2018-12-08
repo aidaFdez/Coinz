@@ -54,6 +54,7 @@ public class SendCoins extends AppCompatActivity {
         emailToSend = (EditText) findViewById(R.id.email_to_send);
     }
 
+
     public void sendQuid(View view){
         String emailString = emailToSend.getText().toString().trim();
 
@@ -82,6 +83,7 @@ public class SendCoins extends AppCompatActivity {
         if(numQuid>= quidCount) {
             HashMap<String, String[]> quidHash = MainActivity.coinsQuid;
             List<String> keys = new ArrayList(quidHash.keySet());
+            ArrayList<Boolean> sent = new ArrayList<Boolean>();
 
             for (int i = 0; i <quidCount; i++) {
                 String id = keys.get(i);
@@ -100,8 +102,9 @@ public class SendCoins extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         MainActivity.coinsQuid.remove(keys.get(index));
                         coinsOverall.remove(keys.get(index));
-                        Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
+                        MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
                         displayQuid();
+                        sent.add(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -109,8 +112,14 @@ public class SendCoins extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
                         Log.d("Send coin", e.toString());
+                        sent.add(false);
                     }
                 });
+            }
+            if(sent.contains(false)){
+                Toast.makeText(SendCoins.this, "One or more coins were not sent", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(SendCoins.this, "Coins sent successfully", Toast.LENGTH_SHORT).show();
             }
             setNumCoinsSent(SendCoins.this, quidCount);
             if(Medals.checkGoals(SendCoins.this)){
@@ -123,6 +132,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendShil(View view){
+        ArrayList<Boolean> sent = new ArrayList<Boolean>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -164,8 +174,9 @@ public class SendCoins extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsShil.remove(keys.get(index));
                                 coinsOverall.remove(keys.get(index));
-                                Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
+                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
                                 displayShil();
+                                sent.add(true);
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -173,8 +184,14 @@ public class SendCoins extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
                                 Log.d("Send coin", e.toString());
+                                sent.add(false);
                             }
                         });
+            }
+            if(sent.contains(false)){
+                Toast.makeText(SendCoins.this, "One or more coins were not sent", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(SendCoins.this, "Coins sent successfully", Toast.LENGTH_SHORT).show();
             }
             setNumCoinsSent(SendCoins.this, shilCount);
             if(Medals.checkGoals(SendCoins.this)){
@@ -187,6 +204,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendDolr(View view){
+        ArrayList<Boolean> sent = new ArrayList<Boolean>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -228,8 +246,9 @@ public class SendCoins extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsDolr.remove(keys.get(index));
                                 coinsOverall.remove(keys.get(index));
-                                Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
+                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
                                 displayDolr();
+                                sent.add(true);
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -237,8 +256,14 @@ public class SendCoins extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
                                 Log.d("Send coin", e.toString());
+                                sent.add(false);
                             }
                         });
+            }
+            if(sent.contains(false)){
+                Toast.makeText(SendCoins.this, "One or more coins were not sent", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(SendCoins.this, "Coins sent successfully", Toast.LENGTH_SHORT).show();
             }
             setNumCoinsSent(SendCoins.this, dolrCount);
             if(Medals.checkGoals(SendCoins.this)){
@@ -251,6 +276,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendPeny(View view){
+        ArrayList<Boolean> sent = new ArrayList<Boolean>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -292,8 +318,10 @@ public class SendCoins extends AppCompatActivity {
                             public void onSuccess(Void aVoid) {
                                 MainActivity.coinsPeny.remove(keys.get(index));
                                 coinsOverall.remove(keys.get(index));
-                                Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
+                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
+                                //Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
                                 displayPenny();
+                                sent.add(true);
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -301,8 +329,14 @@ public class SendCoins extends AppCompatActivity {
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
                                 Log.d("Send coin", e.toString());
+                                sent.add(false);
                             }
                         });
+            }
+            if(sent.contains(false)){
+                Toast.makeText(SendCoins.this, "One or more coins were not sent", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(SendCoins.this, "Coins sent successfully", Toast.LENGTH_SHORT).show();
             }
             setNumCoinsSent(SendCoins.this, penyCount);
             if(Medals.checkGoals(SendCoins.this)){
