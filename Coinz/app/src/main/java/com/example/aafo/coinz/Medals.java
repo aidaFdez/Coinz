@@ -47,7 +47,7 @@ public class Medals extends AppCompatActivity {
                 new Goal("Billionaire", "Have a billion gold in the bank"),
                 new Goal("Informed", "Check all the news from one day"),
                 new Goal("Completer", "Complete all of the other goals"),
-                new Goal("Find the cauldron of gold", "There is a cauldron of gold hiding somewhere in the app... As you " +
+                new Goal("Find the pot of gold", "There is a pot of gold hiding somewhere in the app... As you " +
                         "are probably not a goblin, you can't see it, but you can still touch it. Good luck!"),
 
                 new Goal("Supportive user", "Play the game seven days in a row")
