@@ -1,11 +1,13 @@
 package com.example.aafo.coinz;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -17,6 +19,10 @@ public class Medals extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_medals);
+
+        if(getFirstTime(Medals.this)){
+            showHelpDialog();
+        }
 
         RecyclerView rvGoals = (RecyclerView) findViewById(R.id.goalsRV);
         Goal[] goals = Goal.getGoals(Medals.this);
@@ -155,5 +161,32 @@ public class Medals extends AppCompatActivity {
         Log.d("Goals" , ret);
         Goal.setGoals(context, goals);
         return newAchieved;
+    }
+
+    private SharedPreferences sharedPrefs;
+    private static String PREF_NAME = "preferences";
+
+    private static SharedPreferences getPrefs(Context context){
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    private static boolean getFirstTime(Context context){
+        boolean ret = getPrefs(context).getBoolean("First time achievements", true);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putBoolean("First time achievements", false);
+        editor.commit();
+        return ret;
+    }
+
+    //Show an alert dialog with the same information as the first time the user opened the activity
+    public void showHelp(View view){
+        showHelpDialog();
+    }
+
+    public void showHelpDialog(){
+        android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Help").setMessage(R.string.achievements_explanation);
+        android.support.v7.app.AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

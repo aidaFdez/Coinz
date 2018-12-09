@@ -42,6 +42,10 @@ public class SendCoins extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        if(getFirstTime(SendCoins.this)){
+            showHelpDialog();
+        }
+
         displayDolr();
         displayPenny();
         displayQuid();
@@ -447,5 +451,25 @@ public class SendCoins extends AppCompatActivity {
     }
     public static int getNumCoinsSent(Context context){
         return getPrefs(context).getInt("sentCoins", 0);
+    }
+
+    private static boolean getFirstTime(Context context){
+        boolean ret = getPrefs(context).getBoolean("First time sendCoins", true);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putBoolean("First time sendCoins", false);
+        editor.commit();
+        return ret;
+    }
+
+    //Show an alert dialog with the same information as the first time the user opened the activity
+    public void showHelp(View view){
+        showHelpDialog();
+    }
+
+    public void showHelpDialog(){
+        android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Help").setMessage(R.string.sendCoins_explanation);
+        android.support.v7.app.AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

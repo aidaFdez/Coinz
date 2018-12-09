@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="QUID">#FFDF00</color>
-    <color name="SHIL">#0000FF</color>
-    <color name="PENY">#FF0000</color>
-    <color name="DOLR">#008000</color>
+    <color name="colorPrimary">#6eb53f</color>
+    <color name="colorPrimaryDark">#6eb53f</color>
+    <color name="colorAccent">#32e17b</color>
+    <color name="QUID">#dec201</color>
+    <color name="SHIL">#0000d6</color>
+    <color name="PENY">#d60000</color>
+    <color name="DOLR">#00ae00</color>
     <color name="Red">#ec3b3b</color>
     <color name="Green">#0f9f5f</color>
 </resources>

@@ -180,74 +180,71 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
 
                         //Code based on https://www.mapbox.com/android-docs/maps/overview/annotations/
-                        mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
-                            @Override
-                            public boolean onMarkerClick(@NonNull Marker marker) {
-                                try {
-                                    JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
-                                            .getJSONObject("properties");
-                                    LatLng markerLtLn = marker.getPosition();
-                                    double markerLt = markerLtLn.getLatitude();
-                                    double markerLn = markerLtLn.getLongitude();
+                        mapboxMap.setOnMarkerClickListener(marker -> {
+                            try {
+                                JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
+                                        .getJSONObject("properties");
+                                LatLng markerLtLn = marker.getPosition();
+                                double markerLt = markerLtLn.getLatitude();
+                                double markerLn = markerLtLn.getLongitude();
 
-                                    AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
-                                    builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
-                                    AlertDialog dialogg = builderr.create();
-                                    if(originLocation == null){
-                                        dialogg.show();
-                                    }else{
-                                        double userLt = originLocation.getLatitude();
-                                        double userLn = originLocation.getLongitude();
-                                        double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
-                                        //if(distance<25.0){
-                                        AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
-                                        builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
-                                                .setTitle("Pick up the coin")
-                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
+                                AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
+                                builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
+                                AlertDialog dialogg = builderr.create();
+                                if(originLocation == null){
+                                    dialogg.show();
+                                }else{
+                                    double userLt = originLocation.getLatitude();
+                                    double userLn = originLocation.getLongitude();
+                                    double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
+                                    //if(distance<25.0){
+                                    AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
+                                            .setTitle("Pick up the coin")
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
 
-                                                        //Pick up the coin, so store it in the coins hashmap. Then delete it
-                                                        try {
-                                                            String value = props.getString("value");
-                                                            String currency = props.getString("currency");
-                                                            //Save the coin with the others
-                                                            addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
-                                                            //Update the text to add the new coin to the counter
-                                                            changeText();
-                                                            addPickedCoin(MainActivity.this, marker.getSnippet());
-                                                            mapboxMap.removeMarker(marker);
-                                                        } catch (JSONException e) {
-                                                            Log.e("putInPrefs", ""+e);
-                                                        }
-                                                        if(Medals.checkGoals(context)){
-                                                            Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                        //Add one to the total of picked coins
-                                                        setCoinsPicked(context, 1);
-                                                        Log.d(TAG, "Coin picked");
+                                                    //Pick up the coin, so store it in the coins hashmap. Then delete it
+                                                    try {
+                                                        String value = props.getString("value");
+                                                        String currency = props.getString("currency");
+                                                        //Save the coin with the others
+                                                        addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
+                                                        //Update the text to add the new coin to the counter
+                                                        changeText();
+                                                        addPickedCoin(MainActivity.this, marker.getSnippet());
+                                                        mapboxMap.removeMarker(marker);
+                                                    } catch (JSONException e) {
+                                                        Log.e("putInPrefs", ""+e);
                                                     }
-                                                })
-                                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        //Nothing here, so it will close the dialog when "No" is clicked
+                                                    if(Medals.checkGoals(context)){
+                                                        Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
                                                     }
-                                                });
+                                                    //Add one to the total of picked coins
+                                                    setCoinsPicked(context, 1);
+                                                    Log.d(TAG, "Coin picked");
+                                                }
+                                            })
+                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    //Nothing here, so it will close the dialog when "No" is clicked
+                                                }
+                                            });
 
-                                        AlertDialog dialog = builder.create();
-                                        dialog.show();
-                                    }
-
-                                    //}else{
-                                    //    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
-                                    //}
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
                                 }
-                                return true;
+
+                                //}else{
+                                //    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
+                                //}
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                            return true;
                         });
                     }
 

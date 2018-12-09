@@ -23,6 +23,7 @@ public class Bank extends AppCompatActivity {
     private int penyCount = 0;
     private int quidCount = 0;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -535,6 +536,14 @@ public class Bank extends AppCompatActivity {
         float goldToAddF = (float) amount;
         float total = (float) gold + goldToAddF;
         MainActivity.setGold(context, total);
+    }
+
+    //Show an alert dialog with the same information as the first time the user opened the activity
+    public void showHelp(View view){
+        android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Help").setMessage(R.string.bank_explanation);
+        android.support.v7.app.AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private SharedPreferences sharedPrefs;

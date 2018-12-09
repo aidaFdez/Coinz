@@ -24,5 +24,9 @@
         is your new achievement! Have fun completing them!</string>
     <string name="news_explanation">Welcome to the newsstand! Here you can read what has happened for the exchange rates to be like they are. There are four news per
         day. The first one is free, but for reading the others you will need to pay 500 gold each, the reporters need a salary.</string>
-    <string name="send_explanation">You found the social screen! From here you can send coins to your friends and get the ones that they send to you</string>
+    <string name="send_explanation">You found the social screen! From here you can send coins to your friends and get the ones that they send to you. Just go to
+        "Send coins" if you want to send coins to a friend, or click on "Receive coins" if you want to get the coins your friends have sent you.</string>
+    <string name="menu_explanation">This is the menu! From here, you can navigate anywhere in the app, just tap on the corresponding button.</string>
+    <string name="sendCoins_explanation"> Here you can send coins to your friends! Just choose the coins as you would in the bank, input your friend\'s email and
+        send them! You will only be able to send coins to your friends if you have cashed in the 25 daily coins, so make sure to get some gold before coming here!</string>
 </resources>
