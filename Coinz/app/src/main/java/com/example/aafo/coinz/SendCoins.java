@@ -2,9 +2,7 @@ package com.example.aafo.coinz;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +11,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -55,7 +51,7 @@ public class SendCoins extends AppCompatActivity {
         displayChosenPeny();
         displayChosenQuid();
 
-        emailToSend = (EditText) findViewById(R.id.email_to_send);
+        emailToSend = findViewById(R.id.email_to_send);
     }
 
 
@@ -71,6 +67,7 @@ public class SendCoins extends AppCompatActivity {
 
         //If the user tries to send coins to themselves, do not allow it, show a toast
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
@@ -86,8 +83,8 @@ public class SendCoins extends AppCompatActivity {
 
         if(numQuid>= quidCount) {
             HashMap<String, String[]> quidHash = MainActivity.coinsQuid;
-            List<String> keys = new ArrayList(quidHash.keySet());
-            ArrayList<Boolean> sent = new ArrayList<Boolean>();
+            List<String> keys = new ArrayList<>(quidHash.keySet());
+            ArrayList<Boolean> sent = new ArrayList<>();
 
             for (int i = 0; i <quidCount; i++) {
                 String id = keys.get(i);
@@ -96,28 +93,22 @@ public class SendCoins extends AppCompatActivity {
 
                 int index = i;
 
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 map.put(charact[0], charact[1]);
 
 
                 db.collection(emailString).document(id).set(map)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        MainActivity.coinsQuid.remove(keys.get(index));
-                        coinsOverall.remove(keys.get(index));
-                        MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
-                        displayQuid();
-                        sent.add(true);
-                    }
+                .addOnSuccessListener(aVoid -> {
+                    MainActivity.coinsQuid.remove(keys.get(index));
+                    coinsOverall.remove(keys.get(index));
+                    MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
+                    displayQuid();
+                    sent.add(true);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
-                        Log.d("Send coin", e.toString());
-                        sent.add(false);
-                    }
+                .addOnFailureListener(e -> {
+                    Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT).show();
+                    Log.d("Send coin", e.toString());
+                    sent.add(false);
                 });
             }
             if(sent.contains(false)){
@@ -136,7 +127,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendShil(View view){
-        ArrayList<Boolean> sent = new ArrayList<Boolean>();
+        ArrayList<Boolean> sent = new ArrayList<>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -145,6 +136,7 @@ public class SendCoins extends AppCompatActivity {
 
         //If the user tries to send coins to themselves, do not allow it, show a toast
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
@@ -160,7 +152,7 @@ public class SendCoins extends AppCompatActivity {
 
         if(numShil>= shilCount) {
             HashMap<String, String[]> shilHash = MainActivity.coinsShil;
-            List<String> keys = new ArrayList(shilHash.keySet());
+            List<String> keys = new ArrayList<>(shilHash.keySet());
 
             for (int i = 0; i <shilCount; i++) {
                 String id = keys.get(i);
@@ -169,27 +161,21 @@ public class SendCoins extends AppCompatActivity {
 
                 int index = i;
 
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 map.put(charact[0], charact[1]);
 
                 db.collection(emailString).document(id).set(map)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                MainActivity.coinsShil.remove(keys.get(index));
-                                coinsOverall.remove(keys.get(index));
-                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
-                                displayShil();
-                                sent.add(true);
-                            }
+                        .addOnSuccessListener(aVoid -> {
+                            MainActivity.coinsShil.remove(keys.get(index));
+                            coinsOverall.remove(keys.get(index));
+                            MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
+                            displayShil();
+                            sent.add(true);
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
-                                Log.d("Send coin", e.toString());
-                                sent.add(false);
-                            }
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
+                            Log.d("Send coin", e.toString());
+                            sent.add(false);
                         });
             }
             if(sent.contains(false)){
@@ -208,7 +194,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendDolr(View view){
-        ArrayList<Boolean> sent = new ArrayList<Boolean>();
+        ArrayList<Boolean> sent = new ArrayList<>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -217,6 +203,7 @@ public class SendCoins extends AppCompatActivity {
 
         //If the user tries to send coins to themselves, do not allow it, show a toast
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
@@ -232,7 +219,7 @@ public class SendCoins extends AppCompatActivity {
 
         if(numDolr>= dolrCount) {
             HashMap<String, String[]> dolrHash = MainActivity.coinsQuid;
-            List<String> keys = new ArrayList(dolrHash.keySet());
+            List<String> keys = new ArrayList<>(dolrHash.keySet());
 
             for (int i = 0; i <dolrCount; i++) {
                 String id = keys.get(i);
@@ -241,27 +228,21 @@ public class SendCoins extends AppCompatActivity {
 
                 int index = i;
 
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 map.put(charact[0], charact[1]);
 
                 db.collection(emailString).document(id).set(map)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                MainActivity.coinsDolr.remove(keys.get(index));
-                                coinsOverall.remove(keys.get(index));
-                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
-                                displayDolr();
-                                sent.add(true);
-                            }
+                        .addOnSuccessListener(aVoid -> {
+                            MainActivity.coinsDolr.remove(keys.get(index));
+                            coinsOverall.remove(keys.get(index));
+                            MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
+                            displayDolr();
+                            sent.add(true);
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
-                                Log.d("Send coin", e.toString());
-                                sent.add(false);
-                            }
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
+                            Log.d("Send coin", e.toString());
+                            sent.add(false);
                         });
             }
             if(sent.contains(false)){
@@ -280,7 +261,7 @@ public class SendCoins extends AppCompatActivity {
     }
 
     public void sendPeny(View view){
-        ArrayList<Boolean> sent = new ArrayList<Boolean>();
+        ArrayList<Boolean> sent = new ArrayList<>();
         String emailString = emailToSend.getText().toString().trim();
         if(emailString.isEmpty()){
             Toast.makeText(SendCoins.this, "Please provide an email", Toast.LENGTH_SHORT).show();
@@ -289,6 +270,7 @@ public class SendCoins extends AppCompatActivity {
 
         //If the user tries to send coins to themselves, do not allow it, show a toast
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
@@ -304,7 +286,7 @@ public class SendCoins extends AppCompatActivity {
 
         if(numPenny>= penyCount) {
             HashMap<String, String[]> penyHash = MainActivity.coinsPeny;
-            List<String> keys = new ArrayList(penyHash.keySet());
+            List<String> keys = new ArrayList<>(penyHash.keySet());
 
             for (int i = 0; i <penyCount; i++) {
                 String id = keys.get(i);
@@ -313,28 +295,22 @@ public class SendCoins extends AppCompatActivity {
 
                 int index = i;
 
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 map.put(charact[0], charact[1]);
 
                 db.collection(emailString).document(id).set(map)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                MainActivity.coinsPeny.remove(keys.get(index));
-                                coinsOverall.remove(keys.get(index));
-                                MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
-                                //Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
-                                displayPenny();
-                                sent.add(true);
-                            }
+                        .addOnSuccessListener(aVoid -> {
+                            MainActivity.coinsPeny.remove(keys.get(index));
+                            coinsOverall.remove(keys.get(index));
+                            MainActivity.setCoinsOverall(SendCoins.this, coinsOverall);
+                            //Toast.makeText(SendCoins.this, "Coin "+index+" was sent successfully", Toast.LENGTH_SHORT).show();
+                            displayPenny();
+                            sent.add(true);
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
-                                Log.d("Send coin", e.toString());
-                                sent.add(false);
-                            }
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(SendCoins.this, "The coins were not sent", Toast.LENGTH_SHORT);
+                            Log.d("Send coin", e.toString());
+                            sent.add(false);
                         });
             }
             if(sent.contains(false)){
@@ -356,10 +332,7 @@ public class SendCoins extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("You do not have enough coins to make the change.")
                 .setTitle("Lack of coins")
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {}
-                });
+                .setPositiveButton("Close", (dialog, which) -> {});
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -367,42 +340,42 @@ public class SendCoins extends AppCompatActivity {
     public void displayQuid(){
         int quid = MainActivity.getNumQuid(SendCoins.this);
         String toChange = "Quid collected: " + quid;
-        final TextView textView = (TextView) findViewById(R.id.quid_send);
+        final TextView textView = findViewById(R.id.quid_send);
         textView.setText(toChange);
     }
     public void displayPenny(){
         int penny = MainActivity.getNumPenny(SendCoins.this);
         String toChange = "Pennies collected: " + penny;
-        final TextView textView = (TextView) findViewById(R.id.penny_send);
+        final TextView textView = findViewById(R.id.penny_send);
         textView.setText(toChange);
     }
     public void displayDolr(){
         int dolr = MainActivity.getNumDolr(SendCoins.this);
         String toChange = "Dollars collected: " + dolr;
-        final TextView textView = (TextView) findViewById(R.id.dollar_send);
+        final TextView textView = findViewById(R.id.dollar_send);
         textView.setText(toChange);
     }
     public void displayShil(){
         int shil = MainActivity.getNumShil(SendCoins.this);
         String toChange = "Shillings collected: " + shil;
-        final TextView textView = (TextView) findViewById(R.id.shilling_send);
+        final TextView textView = findViewById(R.id.shilling_send);
         textView.setText(toChange);
     }
 
     public void displayChosenShil(){
-        final TextView textView = (TextView) findViewById(R.id.num_shillin_send);
+        final TextView textView = findViewById(R.id.num_shillin_send);
         textView.setText(Integer.toString(shilCount));
     }
     public void displayChosenDolr(){
-        final TextView textView = (TextView) findViewById(R.id.num_dollar_send);
+        final TextView textView = findViewById(R.id.num_dollar_send);
         textView.setText(Integer.toString(dolrCount));
     }
     public void displayChosenQuid(){
-        final TextView textView = (TextView) findViewById(R.id.num_quid_send);
+        final TextView textView = findViewById(R.id.num_quid_send);
         textView.setText(Integer.toString(quidCount));
     }
     public void displayChosenPeny(){
-        final TextView textView = (TextView) findViewById(R.id.num_penny_send);
+        final TextView textView = findViewById(R.id.num_penny_send);
         textView.setText(Integer.toString(penyCount));
     }
 
@@ -437,8 +410,8 @@ public class SendCoins extends AppCompatActivity {
         displayChosenDolr();
     }
 
-    private static String PREF_NAME = "preferences";
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

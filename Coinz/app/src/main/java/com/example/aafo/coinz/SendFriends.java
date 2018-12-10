@@ -3,7 +3,6 @@ package com.example.aafo.coinz;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,20 +10,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SendFriends extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -38,10 +31,6 @@ public class SendFriends extends AppCompatActivity {
 
         database = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-
-        //FirebaseUser user = mAuth.getCurrentUser();
-        //Toast.makeText(SendFriends.this, user.getEmail(), Toast.LENGTH_SHORT).show();
-
     }
 
     public void goToSend(View view){
@@ -52,93 +41,90 @@ public class SendFriends extends AppCompatActivity {
         String TAG = "receiveCoins";
         Log.d(TAG, "Receiving coins from Firebase");
         FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
         String email = user.getEmail();
 
-        database.collection(email).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                Log.d(TAG, "The data was downloaded successfully");
-                if (!queryDocumentSnapshots.isEmpty()){
-                    HashMap<String, String[]> coinsFriendsOverall = MainActivity.getCoinsFriends(SendFriends.this);
-                    List<DocumentSnapshot> coins = queryDocumentSnapshots.getDocuments();
-                    HashMap<String, Integer> newCoins = new HashMap<String, Integer>();
-                    newCoins.put("Quid", 0);
-                    newCoins.put("Shilling", 0);
-                    newCoins.put("Dollar", 0);
-                    newCoins.put("Penny", 0);
-                    for(DocumentSnapshot document:coins){
-                        //Get the name of the document, which is the coin ID
-                        String id = document.getId();
-                        //Get the data from the document
-                        Map<String, Object> values = document.getData();
-                        Object[] currency = values.keySet().toArray();
-                        String value = currency[0].toString();
-                        String curr = values.get(currency[0]).toString();
-                        //Add the new coin to the proper variables
-                        MainActivity.addCoinsFriends(SendFriends.this, id, curr, value);
-                        Log.d(TAG,"Saving coin with id"+ id +" currency "+ curr+ " Value " + value);
-                        coinsFriendsOverall.put(id, new String[]{value, curr});
-                        MainActivity.setCoinsOverallFriends(SendFriends.this, coinsFriendsOverall);
+        assert email != null;
+        database.collection(email).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            Log.d(TAG, "The data was downloaded successfully");
+            if (!queryDocumentSnapshots.isEmpty()){
+                HashMap<String, String[]> coinsFriendsOverall = MainActivity.getCoinsFriends(SendFriends.this);
+                List<DocumentSnapshot> coins = queryDocumentSnapshots.getDocuments();
+                HashMap<String, Integer> newCoins = new HashMap<>();
+                newCoins.put("Quid", 0);
+                newCoins.put("Shilling", 0);
+                newCoins.put("Dollar", 0);
+                newCoins.put("Penny", 0);
+                for(DocumentSnapshot document:coins){
+                    //Get the name of the document, which is the coin ID
+                    String id = document.getId();
+                    //Get the data from the document
+                    Map<String, Object> values = document.getData();
+                    assert values != null;
+                    Object[] currency = values.keySet().toArray();
+                    String value = currency[0].toString();
+                    String curr = values.get(currency[0]).toString();
+                    //Add the new coin to the proper variables
+                    MainActivity.addCoinsFriends(SendFriends.this, id, curr, value);
+                    Log.d(TAG,"Saving coin with id"+ id +" currency "+ curr+ " Value " + value);
+                    coinsFriendsOverall.put(id, new String[]{value, curr});
+                    MainActivity.setCoinsOverallFriends(SendFriends.this, coinsFriendsOverall);
 
-                        //Set the appropriate variable depending on the currency
-                        if(curr.equals("QUID")){
-                            //MainActivity.addQuidFriends(SendFriends.this, 1);
-                            int added = newCoins.get("Quid") +1;
+                    //Set the appropriate variable depending on the currency
+                    switch (curr) {
+                        case "QUID": {
+                            int added = newCoins.get("Quid") + 1;
                             newCoins.put("Quid", added);
+                            break;
                         }
-                        else if(curr.equals("DOLR")){
-                            //MainActivity.addDolrFriends(SendFriends.this, 1);
-                            int added = newCoins.get("Dollar") +1;
+                        case "DOLR": {
+                            int added = newCoins.get("Dollar") + 1;
                             newCoins.put("Dollar", added);
+                            break;
                         }
-                        else if(curr.equals("PENY")){
-                            //MainActivity.addPennyFriends(SendFriends.this, 1);
-                            int added = newCoins.get("Penny") +1;
+                        case "PENY": {
+                            int added = newCoins.get("Penny") + 1;
                             newCoins.put("Penny", added);
+                            break;
                         }
-                        else if(curr.equals("SHIL")){
-                            //MainActivity.addShilFriends(SendFriends.this, 1);
-                            int added = newCoins.get("Shilling") +1;
+                        case "SHIL": {
+                            int added = newCoins.get("Shilling") + 1;
                             newCoins.put("Shilling", added);
+                            break;
                         }
-                        //Delete the coin from the database
-                        database.collection(email).document(id).delete();
-
                     }
-                    MainActivity.setCoinsFriends(SendFriends.this);
+                    //Delete the coin from the database
+                    database.collection(email).document(id).delete();
 
-                    //Write in a string the coins that have been received by the user
-                    String toShow = "";
-                    int received = 0;
-                    for(String currency : newCoins.keySet()){
-                        toShow = toShow + currency + ": " + newCoins.get(currency) + "\n";
-                        received = received+newCoins.get(currency);
-                    }
-
-                    //Build an alert dialog to tell the user what coins they hae received from friends
-                    AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
-                    setNumCoinsReceived(SendFriends.this, received);
-                    builder.setMessage(toShow).setTitle("Coins received");
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                    if(Medals.checkGoals(SendFriends.this)){
-                        Toast.makeText(SendFriends.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
-                    }
                 }
-                else{
-                    Toast.makeText(SendFriends.this, "No coins were found", Toast.LENGTH_SHORT).show();
+                MainActivity.setCoinsFriends(SendFriends.this);
+
+                //Write in a string the coins that have been received by the user
+                StringBuilder toShow = new StringBuilder();
+                int received = 0;
+                for(String currency : newCoins.keySet()){
+                    toShow.append(currency).append(": ").append(newCoins.get(currency)).append("\n");
+                    received = received+newCoins.get(currency);
+                }
+
+                //Build an alert dialog to tell the user what coins they hae received from friends
+                AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
+                setNumCoinsReceived(SendFriends.this, received);
+                builder.setMessage(toShow.toString()).setTitle("Coins received");
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                if(Medals.checkGoals(SendFriends.this)){
+                    Toast.makeText(SendFriends.this, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(SendFriends.this, "The data could not be accessed", Toast.LENGTH_SHORT).show();
+            else{
+                Toast.makeText(SendFriends.this, "No coins were found", Toast.LENGTH_SHORT).show();
             }
-        });
+        }).addOnFailureListener(e -> Toast.makeText(SendFriends.this, "The data could not be accessed", Toast.LENGTH_SHORT).show());
     }
 
-    private static String PREF_NAME = "preferences";
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

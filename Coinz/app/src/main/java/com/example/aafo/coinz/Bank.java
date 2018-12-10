@@ -1,8 +1,8 @@
 package com.example.aafo.coinz;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class Bank extends AppCompatActivity {
     //Displaying all the data on the screen
     public void displayInfo(){
         HashMap<String, Float> ratesHash = MainActivity.ratesHash;
-        final TextView textView = (TextView) findViewById(R.id.info); //penny, dollar shilling quid
+        final TextView textView = findViewById(R.id.info); //penny, dollar shilling quid
         String toChange = "Penny rate: " + ratesHash.get("PENY").toString()
                             + "\nDollar rate: " + ratesHash.get("DOLR").toString()
                             + "\nShilling rate: " + ratesHash.get("SHIL").toString()
@@ -58,45 +57,49 @@ public class Bank extends AppCompatActivity {
         int quid = MainActivity.getNumQuid(Bank.this);
         int quidFriends = MainActivity.getNumQuidFriends(Bank.this);
         String toChange = "Quid collected: " + quid + "\nFrom friends: " + quidFriends;
-        final TextView textView = (TextView) findViewById(R.id.quid);
+        final TextView textView = findViewById(R.id.quid);
         textView.setText(toChange);
     }
     public void displayPenny(){
         int penny = MainActivity.getNumPenny(Bank.this);
         int penFriends = MainActivity.getNumPennyFriends(Bank.this);
         String toChange = "Pennies collected: " + penny + "\nFrom friends: " + penFriends;
-        final TextView textView = (TextView) findViewById(R.id.penny);
+        final TextView textView = findViewById(R.id.penny);
         textView.setText(toChange);
     }
     public void displayDolr(){
         int dolr = MainActivity.getNumDolr(Bank.this);
         int dolrFriends = MainActivity.getNumDolrFriends(Bank.this);
         String toChange = "Dollars collected: " + dolr + "\nFrom friends: " + dolrFriends;
-        final TextView textView = (TextView) findViewById(R.id.dollar);
+        final TextView textView = findViewById(R.id.dollar);
         textView.setText(toChange);
     }
     public void displayShil(){
         int shil = MainActivity.getNumShil(Bank.this);
         int shilFriends = MainActivity.getNumShilFriends(Bank.this);
         String toChange = "Shillings collected: " + shil + "\nFrom friends: " + shilFriends;
-        final TextView textView = (TextView) findViewById(R.id.shilling);
+        final TextView textView = findViewById(R.id.shilling);
         textView.setText(toChange);
     }
 
+    @SuppressLint("SetTextI18n")
     public void displayChosenShil(){
-        final TextView textView = (TextView) findViewById(R.id.num_shillin);
+        final TextView textView = findViewById(R.id.num_shillin);
         textView.setText(Integer.toString(shilCount));
     }
+    @SuppressLint("SetTextI18n")
     public void displayChosenDolr(){
-        final TextView textView = (TextView) findViewById(R.id.num_dollar);
+        final TextView textView = findViewById(R.id.num_dollar);
         textView.setText(Integer.toString(dolrCount));
     }
+    @SuppressLint("SetTextI18n")
     public void displayChosenQuid(){
-        final TextView textView = (TextView) findViewById(R.id.num_quid);
+        final TextView textView = findViewById(R.id.num_quid);
         textView.setText(Integer.toString(quidCount));
     }
+    @SuppressLint("SetTextI18n")
     public void displayChosenPeny(){
-        final TextView textView = (TextView) findViewById(R.id.num_penny);
+        final TextView textView = findViewById(R.id.num_penny);
         textView.setText(Integer.toString(penyCount));
     }
 
@@ -155,11 +158,11 @@ public class Bank extends AppCompatActivity {
             MainActivity.setCoins(Bank.this);
             MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> quidHash = MainActivity.coinsQuid;
-            ArrayList<String> keys = new ArrayList(quidHash.keySet());
+            ArrayList<String> keys = new ArrayList<>(quidHash.keySet());
 
             HashMap<String, String[]> quidHashFriends = MainActivity.coinsQuidFriends;
             Log.d(TAG, "Size quidFriends: " + quidHash.size());
-            ArrayList<String> keysFriends = new ArrayList(quidHashFriends.keySet());
+            ArrayList<String> keysFriends = new ArrayList<>(quidHashFriends.keySet());
 
 
             //If the number of coins to change can be covered by the user's coins, use them
@@ -215,11 +218,11 @@ public class Bank extends AppCompatActivity {
             MainActivity.setCoins(Bank.this);
             MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> dolrHash = MainActivity.coinsDolr;
-            ArrayList<String> keys = new ArrayList(dolrHash.keySet());
+            ArrayList<String> keys = new ArrayList<>(dolrHash.keySet());
 
             HashMap<String, String[]> dolrHashFriends = MainActivity.coinsDolrFriends;
             Log.d(TAG, "Size dolrFriends: " + dolrHash.size());
-            ArrayList<String> keysFriends = new ArrayList(dolrHashFriends.keySet());
+            ArrayList<String> keysFriends = new ArrayList<>(dolrHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numDolr >= dolrCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=dolrCount){
@@ -274,11 +277,11 @@ public class Bank extends AppCompatActivity {
             MainActivity.setCoins(Bank.this);
             MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> penyHash = MainActivity.coinsPeny;
-            ArrayList<String> keys = new ArrayList(penyHash.keySet());
+            ArrayList<String> keys = new ArrayList<>(penyHash.keySet());
 
             HashMap<String, String[]> penyHashFriends = MainActivity.coinsPenyFriends;
             Log.d(TAG, "Size penyFriends: " + penyHash.size());
-            ArrayList<String> keysFriends = new ArrayList(penyHashFriends.keySet());
+            ArrayList<String> keysFriends = new ArrayList<>(penyHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numPeny >= penyCount && getCoinsCashed(Bank.this)<25 &&((25-getCoinsCashed(Bank.this))<=penyCount)){
@@ -333,11 +336,11 @@ public class Bank extends AppCompatActivity {
             MainActivity.setCoins(Bank.this);
             MainActivity.setCoinsFriends(Bank.this);
             HashMap<String, String[]> shilHash = MainActivity.coinsShil;
-            ArrayList<String> keys = new ArrayList(shilHash.keySet());
+            ArrayList<String> keys = new ArrayList<>(shilHash.keySet());
 
             HashMap<String, String[]> shilHashFriends = MainActivity.coinsShilFriends;
             Log.d(TAG, "Size shilFriends: " + shilHash.size());
-            ArrayList<String> keysFriends = new ArrayList(shilHashFriends.keySet());
+            ArrayList<String> keysFriends = new ArrayList<>(shilHashFriends.keySet());
 
             //If the number of coins to change can be covered by the user's coins, use them
             if(numShil >= shilCount && getCoinsCashed(Bank.this)<25 &&(25-getCoinsCashed(Bank.this))<=shilCount){
@@ -512,10 +515,7 @@ public class Bank extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("You do not have enough coins to make the change.")
                 .setTitle("Lack of coins")
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {}
-                });
+                .setPositiveButton("Close", (dialog, which) -> {});
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -524,10 +524,7 @@ public class Bank extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(amount + " coin/s had already been cashed before.")
                 .setTitle("Already cashed")
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {}
-                });
+                .setPositiveButton("Close", (dialog, which) -> {});
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -546,10 +543,8 @@ public class Bank extends AppCompatActivity {
         dialog.show();
     }
 
-    private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
-
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

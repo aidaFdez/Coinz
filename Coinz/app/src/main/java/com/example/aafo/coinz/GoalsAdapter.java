@@ -10,27 +10,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Set;
 
 public class GoalsAdapter extends RecyclerView.Adapter<GoalsAdapter.ViewHolder>{
-    String TAG = "GoalsAdapter";
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView nameTextview;
-        public TextView descrTextview;
+    class ViewHolder extends RecyclerView.ViewHolder{
+        TextView nameTextview;
+        TextView descrTextview;
 
-        public ViewHolder(View itemView){
+        ViewHolder(View itemView){
             super(itemView);
+            String TAG = "GoalsAdapter";
             Log.d(TAG, "");
-            nameTextview = (TextView) itemView.findViewById(R.id.goal_name);
-            descrTextview = (TextView) itemView.findViewById(R.id.goal_description);
+            nameTextview = itemView.findViewById(R.id.goal_name);
+            descrTextview = itemView.findViewById(R.id.goal_description);
         }
     }
     private Goal[] goalsArray;
 
-    public GoalsAdapter(Goal[] goals){
+    GoalsAdapter(Goal[] goals){
         goalsArray = goals;
     }
 
@@ -45,14 +42,13 @@ public class GoalsAdapter extends RecyclerView.Adapter<GoalsAdapter.ViewHolder>{
         View goalView = inflater.inflate(R.layout.goals, parent, false);
 
         //Return a new holder instance
-        ViewHolder viewHolder = new ViewHolder(goalView);
-        return viewHolder;
+        return new ViewHolder(goalView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //Get the data model based on position
-        Goal goal = (Goal) goalsArray[position];
+        Goal goal = goalsArray[position];
 
         //Set item views based on your views and data model
         TextView textView = holder.nameTextview;

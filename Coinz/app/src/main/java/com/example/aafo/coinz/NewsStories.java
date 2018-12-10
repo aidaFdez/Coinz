@@ -9,7 +9,7 @@ public class NewsStories {
     private String title;
     private String description;
 
-    public NewsStories(String titlee, String descriptionn){
+    private NewsStories(String titlee, String descriptionn){
         title = titlee;
         description= descriptionn;
     }
@@ -37,7 +37,7 @@ public class NewsStories {
         currToCountry.put("PENY", "Penny");
     }
 
-    public static String[] getCurrenciesOrdered(){
+    private static String[] getCurrenciesOrdered(){
         HashMap<String, Float> ratesHash = MainActivity.ratesHash;
         Float[] values = ratesHash.values().toArray(new Float[ratesHash.size()]);
         Arrays.sort(values);
@@ -52,7 +52,7 @@ public class NewsStories {
         return sortedCurrencies;
     }
 
-    public static NewsStories getGood(String currency, int position){
+    private static NewsStories getGood(String currency, int position){
         String goodFirstTitle = "Fire!";
         String goodFirst = "Last night, in "+currToCountry.get(currToCountry.get(currency))+" , a fire has burnt down the mint, losing around a billion of " +
                 currToCountry.get(currency)+ ". Given the shortage of currency in the country and the large amount of gold it has in its vaults, the value " +
@@ -75,7 +75,7 @@ public class NewsStories {
         return (new NewsStories(goods[position+5], goods[position]));
     }
 
-    public static NewsStories getInter(String currency, int position){
+    private static NewsStories getInter(String currency, int position){
         String interFirstTitle = "";
         String interFirst = "";
 
@@ -106,7 +106,7 @@ public class NewsStories {
     }
 
 
-    public static NewsStories getBad(String currency, int position){
+    private static NewsStories getBad(String currency, int position){
         String badFirstTitle = "";
         String badFirst = "";
 

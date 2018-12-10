@@ -48,8 +48,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, String> {
 
         //Code from https://stackoverflow.com/questions/309424/how-to-read-convert-an-inputstream-into-a-string-in-java
         Scanner s = new Scanner(stream).useDelimiter("\\A");
-        String toRet = s.hasNext() ? s.next() : "";
-        return toRet;
+        return s.hasNext() ? s.next() : "";
     }
 
     @Override

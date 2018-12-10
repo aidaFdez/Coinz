@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -31,18 +29,9 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.GeoJson;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.Point;
-import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
-import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -52,25 +41,18 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.RenderMode;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
 import java.util.HashMap;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
@@ -81,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationLayerPlugin locationLayerPlugin;
     private Location originLocation;
     private String jSon;
-    private HashMap<String, Integer> coinsToday = new HashMap<String, Integer>();
-    public static HashMap<String, Float> ratesHash = new HashMap<String, Float>();
+    private HashMap<String, Integer> coinsToday = new HashMap<>();
+    public static HashMap<String, Float> ratesHash = new HashMap<>();
 
     private String TAG = "MainActivity";
 
@@ -119,139 +101,130 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         //Code based on http://www.mapbox.com.s3-website-us-east-1.amazonaws.com/android-sdk/examples/geojson/
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                //ArrayList<MarkerOptions> optionsList = new ArrayList<>();
-                try {
-                    //HashMap<String, String[]> pickedCoins = new HashMap<>();
-                    JSONObject jSonObj = new JSONObject(jSon);
-                    JSONArray features = jSonObj.getJSONArray("features");
+        mapView.getMapAsync(mapboxMap -> {
+            try {
+                JSONObject jSonObj = new JSONObject(jSon);
+                JSONArray features = jSonObj.getJSONArray("features");
 
-                    JSONObject rates = jSonObj.getJSONObject("rates");
-                    Float rateQuid = Float.parseFloat(rates.getString("QUID"));
-                    Float ratePeny = Float.parseFloat(rates.getString("PENY"));
-                    Float rateDolr = Float.parseFloat(rates.getString("DOLR"));
-                    Float rateShil = Float.parseFloat(rates.getString("SHIL"));
+                JSONObject rates = jSonObj.getJSONObject("rates");
+                Float rateQuid = Float.parseFloat(rates.getString("QUID"));
+                Float ratePeny = Float.parseFloat(rates.getString("PENY"));
+                Float rateDolr = Float.parseFloat(rates.getString("DOLR"));
+                Float rateShil = Float.parseFloat(rates.getString("SHIL"));
 
-                    ratesHash.put("QUID", rateQuid);
-                    ratesHash.put("PENY", ratePeny);
-                    ratesHash.put("DOLR", rateDolr);
-                    ratesHash.put("SHIL", rateShil);
+                ratesHash.put("QUID", rateQuid);
+                ratesHash.put("PENY", ratePeny);
+                ratesHash.put("DOLR", rateDolr);
+                ratesHash.put("SHIL", rateShil);
 
-                    for(int i=0; i<features.length();i++){
-                        //Getting all the relevant properties of each feature for creating the marker.
-                        JSONObject feature = features.getJSONObject(i);
-                        JSONObject geometry = feature.getJSONObject("geometry");
-                        JSONArray coords = geometry.getJSONArray("coordinates");
-                        JSONObject properties = feature.getJSONObject("properties");
-                        String curr = properties.getString("currency");
+                for(int i=0; i<features.length();i++){
+                    //Getting all the relevant properties of each feature for creating the marker.
+                    JSONObject feature = features.getJSONObject(i);
+                    JSONObject geometry = feature.getJSONObject("geometry");
+                    JSONArray coords = geometry.getJSONArray("coordinates");
+                    JSONObject properties = feature.getJSONObject("properties");
+                    String curr = properties.getString("currency");
 
-                        Context context = getApplicationContext();
-                        Integer colour = 0;
+                    Context context = getApplicationContext();
+                    Integer colour = 0;
 
-                        //Set the colour of the marker based on the coin's currency
-                        if(curr.equals("SHIL")){
+                    //Set the colour of the marker based on the coin's currency
+                    switch (curr) {
+                        case "SHIL":
                             colour = getResources().getColor(R.color.SHIL);
-                        }
-                        if(curr.equals("QUID")){
+                            break;
+                        case "QUID":
                             colour = getResources().getColor(R.color.QUID);
-                        }
-                        if(curr .equals("PENY")){
+                            break;
+                        case "PENY":
                             colour = getResources().getColor(R.color.PENY);
-                        }
-                        if(curr.equals("DOLR")){
+                            break;
+                        case "DOLR":
                             colour = getResources().getColor(R.color.DOLR);
-                        }
-                        Icon icon = drawableToIcon(context, R.drawable.loc_icon,colour);
+                            break;
+                    }
+                    Icon icon = drawableToIcon(context, R.drawable.loc_icon,colour);
 
-                        String id = properties.getString("id");
+                    String id = properties.getString("id");
 
-                        MarkerOptions coin = new MarkerOptions();
-                        coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
-                                .icon(icon)
-                                .setSnippet(id);
-                        coinsToday.put(id, i);
-                        //This actually works, the problem is the data stored in the coins. Could have Hm of not picked(?)
-                        //If the coin has been picked up already, do not put it in the map
-                        if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id"))) &&
-                           !(getPickedCoins(MainActivity.this).contains(properties.getString("id")))){
-                            mapboxMap.addMarker(coin);
-                        }
-
-                        //Code based on https://www.mapbox.com/android-docs/maps/overview/annotations/
-                        mapboxMap.setOnMarkerClickListener(marker -> {
-                            try {
-                                JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
-                                        .getJSONObject("properties");
-                                LatLng markerLtLn = marker.getPosition();
-                                double markerLt = markerLtLn.getLatitude();
-                                double markerLn = markerLtLn.getLongitude();
-
-                                AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
-                                builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
-                                AlertDialog dialogg = builderr.create();
-                                if(originLocation == null){
-                                    dialogg.show();
-                                }else{
-                                    double userLt = originLocation.getLatitude();
-                                    double userLn = originLocation.getLongitude();
-                                    double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
-                                    //if(distance<25.0){
-                                    AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
-                                    builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
-                                            .setTitle("Pick up the coin")
-                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-
-                                                    //Pick up the coin, so store it in the coins hashmap. Then delete it
-                                                    try {
-                                                        String value = props.getString("value");
-                                                        String currency = props.getString("currency");
-                                                        //Save the coin with the others
-                                                        addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
-                                                        //Update the text to add the new coin to the counter
-                                                        changeText();
-                                                        addPickedCoin(MainActivity.this, marker.getSnippet());
-                                                        mapboxMap.removeMarker(marker);
-                                                    } catch (JSONException e) {
-                                                        Log.e("putInPrefs", ""+e);
-                                                    }
-                                                    if(Medals.checkGoals(context)){
-                                                        Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                    //Add one to the total of picked coins
-                                                    setCoinsPicked(context, 1);
-                                                    Log.d(TAG, "Coin picked");
-                                                }
-                                            })
-                                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //Nothing here, so it will close the dialog when "No" is clicked
-                                                }
-                                            });
-
-                                    AlertDialog dialog = builder.create();
-                                    dialog.show();
-                                }
-
-                                //}else{
-                                //    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
-                                //}
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            return true;
-                        });
+                    MarkerOptions coin = new MarkerOptions();
+                    coin.position(new LatLng(coords.getDouble(1), coords.getDouble(0)))
+                            .icon(icon)
+                            .setSnippet(id);
+                    coinsToday.put(id, i);
+                    //If the coin has been picked up already, do not put it in the map
+                    if(!(getCoinsOverall(MainActivity.this).containsKey(properties.getString("id"))) &&
+                       !(getPickedCoins(MainActivity.this).contains(properties.getString("id")))){
+                        mapboxMap.addMarker(coin);
                     }
 
-                } catch (Exception e) {
-                    Log.e("markers","" + e);
-                    e.printStackTrace();
+                    //Code based on https://www.mapbox.com/android-docs/maps/overview/annotations/
+                    mapboxMap.setOnMarkerClickListener(marker -> {
+                        try {
+                            JSONObject props = features.getJSONObject(coinsToday.get(marker.getSnippet()))
+                                    .getJSONObject("properties");
+                            LatLng markerLtLn = marker.getPosition();
+                            double markerLt = markerLtLn.getLatitude();
+                            double markerLn = markerLtLn.getLongitude();
+
+                            AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
+                            builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
+                            AlertDialog dialogg = builderr.create();
+                            if(originLocation == null){
+                                dialogg.show();
+                            }else{
+                                double userLt = originLocation.getLatitude();
+                                double userLn = originLocation.getLongitude();
+                                double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
+                                if(distance<25.0){
+                                AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
+                                builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
+                                        .setTitle("Pick up the coin")
+                                        .setPositiveButton("Yes", (dialog, which) -> {
+
+                                            //Pick up the coin, so store it in the coins hashmap. Then delete it
+                                            try {
+                                                String value = props.getString("value");
+                                                String currency = props.getString("currency");
+                                                //Save the coin with the others
+                                                addCoinsOverall(MainActivity.this, marker.getSnippet(), value, currency);
+                                                //Update the text to add the new coin to the counter
+                                                changeText();
+                                                addPickedCoin(MainActivity.this, marker.getSnippet());
+                                                mapboxMap.removeMarker(marker);
+                                            } catch (JSONException e) {
+                                                Log.e("putInPrefs", ""+e);
+                                            }
+                                            if(Medals.checkGoals(context)){
+                                                Toast.makeText(context, "New goal/s achieved!", Toast.LENGTH_SHORT).show();
+                                            }
+                                            //Add one to the total of picked coins
+                                            setCoinsPicked(context, 1);
+                                            Log.d(TAG, "Coin picked");
+                                        })
+                                        .setNegativeButton("No", (dialog, which) -> {
+                                            //Nothing here, so it will close the dialog when "No" is clicked
+                                        });
+
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                }else{
+                                    Toast.makeText(MainActivity.this, "You are too far from the coin.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        return true;
+                    });
                 }
+
+            } catch (Exception e) {
+                Log.e("markers","" + e);
+                e.printStackTrace();
             }
         });
         changeText();
@@ -260,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Code from https://stackoverflow.com/questions/37805379/mapbox-for-android-changing-color-of-a-markers-icon
     public static Icon drawableToIcon(@NonNull Context context, @DrawableRes int id, @ColorInt int colorRes) {
         Drawable vectorDrawable = ResourcesCompat.getDrawable(context.getResources(), id, context.getTheme());
+        assert vectorDrawable != null;
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -279,9 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             jSon = new DownloadFileTask().execute(url).get();
             setJson(this, jSon);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -291,8 +263,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static String getDate(){
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date dateObject = new Date();
-        String date = dateFormat.format(dateObject);
-        return date;
+        return dateFormat.format(dateObject);
     }
 
     @Override
@@ -443,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int penny = getNumPenny(context);
         int quid = getNumQuid(context);
         String toChange = "Shillings: "+shil+"\nDollar: " +dolr+"\nPenny: "+penny+"\nQuid: "+quid+"\nGold: "+getGold(MainActivity.this);
-        final TextView textView = (TextView) findViewById(R.id.textView);
+        final TextView textView = findViewById(R.id.textView);
         textView.setText(toChange);
     }
 
@@ -455,18 +426,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //                             //
     /////////////////////////////////
 
-    //Code based on https://stackoverflow.com/questions/23351904/getting-cannot-resolve-method-error-when-trying-to-implement-getsharedpreferen
-    private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
-
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    /*******************/
-    /** Coins related **/
-    /**    methods    **/
-    /*******************/
+    /////////////////////
+    /*  Coins related  */
+    /*    methods      */
+    /////////////////////
 
     public static void addPickedCoin(Context context, String picked){
         Gson gson = new Gson();
@@ -480,15 +448,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     public static ArrayList<String> getPickedCoins(Context context){
         Gson gson = new Gson();
-        ArrayList<String> empty = new ArrayList<String>();
+        ArrayList<String> empty = new ArrayList<>();
         empty.add("");
         String storedArrayString = getPrefs(context).getString("arrayPicked", "");
         java.lang.reflect.Type type = new TypeToken<ArrayList<String>>(){}.getType();
         if(storedArrayString.equals("")){
             return empty;
         }
-        ArrayList<String> array = gson.fromJson(storedArrayString, type);
-        return array;
+        return gson.fromJson(storedArrayString, type);
     }
 
     public static Float getGold(Context context){return getPrefs(context).getFloat("Gold", 0.0f);}
@@ -510,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Code from https://stackoverflow.com/questions/7944601/how-to-save-hashmap-to-shared-preferences
     public static HashMap<String, String[]> getCoinsOverall(Context context){
         Gson gson = new Gson();
-        HashMap<String, String[]> empty = new HashMap<String, String[]>();
+        HashMap<String, String[]> empty = new HashMap<>();
         empty.put("", new String[]{"", ""});
         String storedHashMapString = getPrefs(context).getString("hashCoins", "");
         java.lang.reflect.Type type = new TypeToken<HashMap<String, String[]>>(){}.getType();
@@ -519,8 +486,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return empty;
         }
         //Transform the string into a hashmap and return it
-        HashMap<String, String[]> coinsHash = gson.fromJson(storedHashMapString, type);
-        return coinsHash;
+        return gson.fromJson(storedHashMapString, type);
     }
     public static void setCoinsOverall(Context context, HashMap<String, String[]> coinsOverall){
         Gson gson = new Gson();
@@ -541,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static ArrayList<String> getCoinsUsed(Context context){
         Gson gson = new Gson();
-        ArrayList<String> usedCoins = new ArrayList<String>();
+        ArrayList<String> usedCoins = new ArrayList<>();
         String storedUsedCoins = getPrefs(context).getString("usedCoins", "");
         java.lang.reflect.Type type = new TypeToken<ArrayList<String>>(){}.getType();
         if(storedUsedCoins.equals("")){
@@ -584,7 +550,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static HashMap<String, String[]> getCoinsFriends(Context context){
         Gson gson = new Gson();
-        HashMap<String, String[]> empty = new HashMap<String, String[]>();
+        HashMap<String, String[]> empty = new HashMap<>();
         empty.put("", new String[]{"", ""});
         String storedHashMapString = getPrefs(context).getString("coinsFriends", "");
         java.lang.reflect.Type type = new TypeToken<HashMap<String, String[]>>(){}.getType();
@@ -593,8 +559,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return empty;
         }
         //Transform the string into a hashmap and return it
-        HashMap<String, String[]> coinsFriends = gson.fromJson(storedHashMapString, type);
-        return coinsFriends;
+        return gson.fromJson(storedHashMapString, type);
     }
     public static void setCoinsOverallFriends(Context context, HashMap<String, String[]> coinsOverallFriends){
         String TAG = "setCoinsOverallFriends";
@@ -617,61 +582,65 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
-    public static HashMap<String, String[]> coinsQuid = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsPeny = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsDolr = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsShil = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsQuid = new HashMap<>();
+    public static HashMap<String, String[]> coinsPeny = new HashMap<>();
+    public static HashMap<String, String[]> coinsDolr = new HashMap<>();
+    public static HashMap<String, String[]> coinsShil = new HashMap<>();
 
     //Set the hashmaps for each of the coins.
     public static void setCoins(Context context){
         HashMap<String, String[]> hashCoins = getCoinsOverall(context);
         for(String hash:hashCoins.keySet()){
             String[] content = hashCoins.get(hash);
-            if (content[1].equals("QUID")){
-                coinsQuid.put(hash, content);
-            }
-            if (content[1].equals("DOLR")){
-                coinsDolr.put(hash, content);
-            }
-            if (content[1].equals("PENY")){
-                coinsPeny.put(hash, content);
-            }
-            if (content[1].equals("SHIL")){
-                coinsShil.put(hash, content);
+            switch (content[1]) {
+                case "QUID":
+                    coinsQuid.put(hash, content);
+                    break;
+                case "DOLR":
+                    coinsDolr.put(hash, content);
+                    break;
+                case "PENY":
+                    coinsPeny.put(hash, content);
+                    break;
+                case "SHIL":
+                    coinsShil.put(hash, content);
+                    break;
             }
         }
     }
 
 
-    public static HashMap<String, String[]> coinsQuidFriends = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsPenyFriends = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsDolrFriends = new HashMap<String, String[]>();
-    public static HashMap<String, String[]> coinsShilFriends = new HashMap<String, String[]>();
+    public static HashMap<String, String[]> coinsQuidFriends = new HashMap<>();
+    public static HashMap<String, String[]> coinsPenyFriends = new HashMap<>();
+    public static HashMap<String, String[]> coinsDolrFriends = new HashMap<>();
+    public static HashMap<String, String[]> coinsShilFriends = new HashMap<>();
 
     public static void setCoinsFriends(Context context){
         HashMap<String, String[]> hashCoins = getCoinsFriends(context);
         for(String hash:hashCoins.keySet()){
             String[] content = hashCoins.get(hash);
-            if (content[1].equals("QUID")){
-                coinsQuidFriends.put(hash, content);
-            }
-            if (content[1].equals("DOLR")){
-                coinsDolrFriends.put(hash, content);
-            }
-            if (content[1].equals("PENY")){
-                coinsPenyFriends.put(hash, content);
-            }
-            if (content[1].equals("SHIL")){
-                coinsShilFriends.put(hash, content);
+            switch (content[1]) {
+                case "QUID":
+                    coinsQuidFriends.put(hash, content);
+                    break;
+                case "DOLR":
+                    coinsDolrFriends.put(hash, content);
+                    break;
+                case "PENY":
+                    coinsPenyFriends.put(hash, content);
+                    break;
+                case "SHIL":
+                    coinsShilFriends.put(hash, content);
+                    break;
             }
         }
     }
 
 
 
-    /*******************/
-    /** Other methods **/
-    /*******************/
+    /////////////////////
+    /*  Other methods  */
+    /////////////////////
 
     //Check if it is the first time that the user opens the app (after login in)
     public static boolean firstTime(Context context){

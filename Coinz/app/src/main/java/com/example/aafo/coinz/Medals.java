@@ -9,8 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-import java.util.ArrayList;
-
 
 //I followed the code in https://guides.codepath.com/android/using-the-recyclerview
 public class Medals extends AppCompatActivity {
@@ -24,7 +22,7 @@ public class Medals extends AppCompatActivity {
             showHelpDialog();
         }
 
-        RecyclerView rvGoals = (RecyclerView) findViewById(R.id.goalsRV);
+        RecyclerView rvGoals = findViewById(R.id.goalsRV);
         Goal[] goals = Goal.getGoals(Medals.this);
         //Create adapter passing the data
         GoalsAdapter adapter = new GoalsAdapter(goals);
@@ -65,108 +63,108 @@ public class Medals extends AppCompatActivity {
     public static boolean checkGoals(Context context){
         Goal[] goals = Goal.getGoals(context);
         boolean newAchieved = false;
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         for(Goal goal:goals){
             Log.d("Checking", goal.getName());
-            if(goal.getAchieved()==false){
-                if(goal.getName().equals("Collector")){
-                    if(MainActivity.getPickedCoins(context).size()>=50){
-                        goal.setAchieved(true);
-                        newAchieved=true;
-                    }
-                }
-                else if(goal.getName().equals("Friendly person")){
-                    if(SendCoins.getNumCoinsSent(context)>=10){
-                        newAchieved=true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Nice friends")){
-                    if(SendFriends.getNumCoinsReceived(context)>=10){
-                        newAchieved=true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Loved person")){
-                    if(SendFriends.getNumCoinsReceived(context)>=50){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Cherished person")) {
-                    if (SendFriends.getNumCoinsReceived(context) >= 100) {
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Worshiped person")) {
-                    if (SendFriends.getNumCoinsReceived(context) >= 500) {
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("New bank account")){
-                    if(Bank.getCoinsCashedTotal(context)>=1){
-                        newAchieved=true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Saver")){
-                    if(MainActivity.getNumCoinsPicked(context)>=50){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Accumulator")){
-                    if(MainActivity.getNumCoinsPicked(context)>=100){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Hoarder")){
-                    if(MainActivity.getNumCoinsPicked(context)>=500){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Small fortune")){
-                    if(MainActivity.getGold(context)>=1000){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Fortune")){
-                    if(MainActivity.getGold(context)>=10000){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Millionaire")){
-                    if(MainActivity.getGold(context)>=1000000){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
-                }
-                else if(goal.getName().equals("Billionaire")){
-                    if(MainActivity.getGold(context)>=1000000000){
-                        newAchieved = true;
-                        goal.setAchieved(true);
-                    }
+            if(!goal.getAchieved()){
+                switch (goal.getName()) {
+                    case "Collector":
+                        if (MainActivity.getPickedCoins(context).size() >= 50) {
+                            goal.setAchieved(true);
+                            newAchieved = true;
+                        }
+                        break;
+                    case "Friendly person":
+                        if (SendCoins.getNumCoinsSent(context) >= 10) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Nice friends":
+                        if (SendFriends.getNumCoinsReceived(context) >= 10) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Loved person":
+                        if (SendFriends.getNumCoinsReceived(context) >= 50) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Cherished person":
+                        if (SendFriends.getNumCoinsReceived(context) >= 100) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Worshiped person":
+                        if (SendFriends.getNumCoinsReceived(context) >= 500) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "New bank account":
+                        if (Bank.getCoinsCashedTotal(context) >= 1) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Saver":
+                        if (MainActivity.getNumCoinsPicked(context) >= 50) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Accumulator":
+                        if (MainActivity.getNumCoinsPicked(context) >= 100) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Hoarder":
+                        if (MainActivity.getNumCoinsPicked(context) >= 500) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Small fortune":
+                        if (MainActivity.getGold(context) >= 1000) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Fortune":
+                        if (MainActivity.getGold(context) >= 10000) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Millionaire":
+                        if (MainActivity.getGold(context) >= 1000000) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Billionaire":
+                        if (MainActivity.getGold(context) >= 1000000000) {
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
                 }
 
             }
-            ret = ret+goal.getName() + " " + goal.getAchieved()+"\n";
+            ret.append(goal.getName()).append(" ").append(goal.getAchieved()).append("\n");
         }
-        Log.d("Goals" , ret);
+        Log.d("Goals" , ret.toString());
         Goal.setGoals(context, goals);
         return newAchieved;
     }
 
-    private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
-
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 

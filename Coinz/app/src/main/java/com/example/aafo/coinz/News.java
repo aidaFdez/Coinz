@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import java.util.Random;
 
 public class News extends AppCompatActivity {
 
@@ -70,33 +69,20 @@ public class News extends AppCompatActivity {
         // 2. Chain together various setter methods to set the dialog characteristics
         builder.setMessage("Do you want to spend 500 gold to buy some news?")
                 .setTitle("Buy news")
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Just close the dialog
-                    }
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    //Just close the dialog
                 })
-                .setPositiveButton("Purchase", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Float gold = MainActivity.getGold(News.this);
-                        if(gold>=500.0f){
-                            gold = gold - 500;
-                            MainActivity.setGold(News.this, gold);
-                            showNextNew();
-                        }
+                .setPositiveButton("Purchase", (dialog, which) -> {
+                    Float gold = MainActivity.getGold(News.this);
+                    if(gold>=500.0f){
+                        gold = gold - 500;
+                        MainActivity.setGold(News.this, gold);
+                        showNextNew();
                     }
                 });
         // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    private void showNew(){
-        int numNew = getNumNewsToday(News.this);
-        AlertDialog.Builder builder = new AlertDialog.Builder(News.this);
-
-        builder.setMessage("uyt");
     }
 
 
@@ -112,14 +98,14 @@ public class News extends AppCompatActivity {
     public static void setNumNewsToday(Context context, int num){
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putInt("Num news today", num);
-        editor.commit();
+        editor.apply();
     }
 
     private static boolean getFirstTime(Context context){
         boolean ret = getPrefs(context).getBoolean("First time news", true);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putBoolean("First time news", false);
-        editor.commit();
+        editor.apply();
         return ret;
     }
 
@@ -127,7 +113,7 @@ public class News extends AppCompatActivity {
         boolean ret = getPrefs(context).getBoolean("First time news today", true);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putBoolean("First time news today", false);
-        editor.commit();
+        editor.apply();
         return ret;
     }
 

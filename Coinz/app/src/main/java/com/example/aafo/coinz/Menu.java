@@ -7,12 +7,10 @@ import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 public class Menu extends AppCompatActivity {
 
-    private Toolbar toolbar;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -21,6 +19,7 @@ public class Menu extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.setTitle("Menu");
 
         if (getFirstTime(Menu.this)){
@@ -57,10 +56,8 @@ public class Menu extends AppCompatActivity {
         dialog.show();
     }
 
-    private SharedPreferences sharedPrefs;
-    private static String PREF_NAME = "preferences";
-
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
@@ -68,7 +65,7 @@ public class Menu extends AppCompatActivity {
         boolean ret = getPrefs(context).getBoolean("First time menu", true);
         SharedPreferences.Editor editor = getPrefs(context).edit();
         editor.putBoolean("First time menu", false);
-        editor.commit();
+        editor.apply();
         return ret;
     }
 }

@@ -7,14 +7,13 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 
 public class Goal {
     private String name;
     private String description;
     private boolean achieved;
 
-    public Goal(String name, String description){
+    Goal(String name, String description){
         this.achieved = false;
         this.description = description;
         this.name = name;
@@ -26,8 +25,8 @@ public class Goal {
     public void setAchieved(boolean bool){achieved=bool;}
 
 
-    private static String PREF_NAME = "preferences";
     private static SharedPreferences getPrefs(Context context){
+        String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
@@ -41,8 +40,7 @@ public class Goal {
             return empty/*.toArray(new Goal[empty.size()])*/;
         }
         //Transform the string into an array and return it
-        Goal[] goals = gson.fromJson(storedArrayString, type);
-        return goals/*.toArray(new Goal[goals.size()])*/;
+        return gson.fromJson(storedArrayString, type)/*.toArray(new Goal[goals.size()])*/;
     }
     public static void setGoals(Context context, Goal[] goals){
         Log.d("setGoals", "Committing the goals to the sharedPrefs");
