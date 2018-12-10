@@ -2,6 +2,7 @@ package com.example.aafo.coinz;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,9 +19,15 @@ public class Medals extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_medals);
 
+        //Set the action bar
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Achievements");
+
         if(getFirstTime(Medals.this)){
             showHelpDialog();
         }
+
 
         RecyclerView rvGoals = findViewById(R.id.goalsRV);
         Goal[] goals = Goal.getGoals(Medals.this);
@@ -50,11 +57,8 @@ public class Medals extends AppCompatActivity {
                 new Goal("Millionaire", "Have a million gold in the bank"),
                 new Goal("Billionaire", "Have a billion gold in the bank"),
                 new Goal("Informed", "Check all the news from one day"),
+                new Goal("Find the pot of gold", "There is a pot of gold hiding somewhere in the app..."),
                 new Goal("Completer", "Complete all of the other goals"),
-                new Goal("Find the pot of gold", "There is a pot of gold hiding somewhere in the app... As you " +
-                        "are probably not a goblin, you can't see it, but you can still touch it. Good luck!"),
-
-                new Goal("Supportive user", "Play the game seven days in a row")
         };
         Goal.setGoals(context, goals);
     }
@@ -64,6 +68,7 @@ public class Medals extends AppCompatActivity {
         Goal[] goals = Goal.getGoals(context);
         boolean newAchieved = false;
         StringBuilder ret = new StringBuilder();
+        boolean allComplete = true;
 
         for(Goal goal:goals){
             Log.d("Checking", goal.getName());
@@ -153,9 +158,28 @@ public class Medals extends AppCompatActivity {
                             goal.setAchieved(true);
                         }
                         break;
+                    case "Informed":
+                        if(News.getNumNewsToday(context)>=4){
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Find the pot of gold":
+                        if(!SendFriends.firstTimePotGold(context)){
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
+                        break;
+                    case "Completer":
+                        if(allComplete){
+                            newAchieved = true;
+                            goal.setAchieved(true);
+                        }
                 }
 
             }
+            allComplete = allComplete && goal.getAchieved();
+            //String for the log to say which goals are completed and which are not
             ret.append(goal.getName()).append(" ").append(goal.getAchieved()).append("\n");
         }
         Log.d("Goals" , ret.toString());

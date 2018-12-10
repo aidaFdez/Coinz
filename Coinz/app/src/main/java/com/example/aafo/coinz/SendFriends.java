@@ -3,6 +3,7 @@ package com.example.aafo.coinz;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,14 @@ public class SendFriends extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_friends);
 
+        //Set the action bar
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle("Send coins to friends");
+
+        if(getFirstTime(SendFriends.this)){
+            showHelpDialog();
+        }
 
         database = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -48,6 +57,7 @@ public class SendFriends extends AppCompatActivity {
         database.collection(email).get().addOnSuccessListener(queryDocumentSnapshots -> {
             Log.d(TAG, "The data was downloaded successfully");
             if (!queryDocumentSnapshots.isEmpty()){
+                //Getting all the needed lists of coins
                 HashMap<String, String[]> coinsFriendsOverall = MainActivity.getCoinsFriends(SendFriends.this);
                 List<DocumentSnapshot> coins = queryDocumentSnapshots.getDocuments();
                 HashMap<String, Integer> newCoins = new HashMap<>();
@@ -123,6 +133,27 @@ public class SendFriends extends AppCompatActivity {
         }).addOnFailureListener(e -> Toast.makeText(SendFriends.this, "The data could not be accessed", Toast.LENGTH_SHORT).show());
     }
 
+    public void potOfGold(View view){
+        //If this is the first time the user finds the pot of gold, show a dialog saying so
+        if(firstTimePotGold(SendFriends.this)){
+            AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
+            builder.setTitle("Pot of gold").setMessage("Yay! You found the pot of gol! It has 50000 coins of gold, and they are all for you!");
+            MainActivity.setGold(SendFriends.this, MainActivity.getGold(SendFriends.this)+50000);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            setPotGold(SendFriends.this);
+            Medals.checkGoals(SendFriends.this);
+        }
+    }
+
+    public static boolean firstTimePotGold(Context context){return getPrefs(context).getBoolean("Pot gold", true); }
+
+    private static void setPotGold(Context context){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putBoolean("Pot gold", false);
+        editor.commit();
+    }
+
     private static SharedPreferences getPrefs(Context context){
         String PREF_NAME = "preferences";
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -139,5 +170,25 @@ public class SendFriends extends AppCompatActivity {
     public static int getNumCoinsReceived(Context context){
         Log.d("getNumCoinsReceived", "Getting the number of coins that have been received");
         return getPrefs(context).getInt("receivedCoins", 0);
+    }
+
+    private static boolean getFirstTime(Context context){
+        boolean ret = getPrefs(context).getBoolean("First time sendFriends", true);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putBoolean("First time sendFriends", false);
+        editor.commit();
+        return ret;
+    }
+
+    //Show an alert dialog with the same information as the first time the user opened the activity
+    public void showHelp(View view){
+        showHelpDialog();
+    }
+
+    public void showHelpDialog(){
+        android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Send coins to friends").setMessage(R.string.send_explanation);
+        android.support.v7.app.AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

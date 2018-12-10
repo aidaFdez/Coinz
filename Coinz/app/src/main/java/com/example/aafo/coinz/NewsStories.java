@@ -17,7 +17,7 @@ public class NewsStories {
     public String getTitle(){return title;}
     public String getDescription(){return description;}
 
-    private static HashMap<String, String> currToCountry = new HashMap<String, String>();
+    private static HashMap<String, String> currToCountry = new HashMap<>();
     static{
         String shel = "Shilling";
         String countryShel = "Shililand";
