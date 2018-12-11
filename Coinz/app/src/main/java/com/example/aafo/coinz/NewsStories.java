@@ -82,7 +82,6 @@ public class NewsStories {
 
     private static NewsStories getInter(String currency, int position){
         String country = currToCountry.get(currToCountry.get(currency));
-        String curr = currToCountry.get(currency);
         String interFirstTitle = "Sunny day";
         String interFirst = "Today is a sunny and lazy day in "+country+". People are out enjoying their day off because of the national festivity. We wish everyone " +
                 "in "+country+" a very nice day.";

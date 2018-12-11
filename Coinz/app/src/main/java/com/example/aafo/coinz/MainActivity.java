@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 double userLn = originLocation.getLongitude();
                                 double distance = getDistance(markerLt, userLt, markerLn, userLn, 0.0, 0.0);
                                 //If the user is close enough, then ask if they want to pick up the coin.
-                                if(distance<2500.0){
+                                if(distance<25.0){
                                     //Set the alert dialog that will ask the user if they want to pick up the coin
                                     AlertDialog.Builder builder  = new AlertDialog.Builder(MainActivity.this);
                                     builder.setMessage("Do you want to pick this coin up? \nCurrency: "+props.getString("currency")+" \nValue: "+ props.getString("value") )
