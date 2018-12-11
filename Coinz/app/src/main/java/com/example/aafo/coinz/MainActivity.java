@@ -711,7 +711,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static void resetVariables(Context context){
         Bank.resetCoinsCashed(context);
         News.resetFirstTimeToday(context);
-
+        News.resetNewsSeen(context);
     }
 
     //Get the number of coins tha the user has collected in total

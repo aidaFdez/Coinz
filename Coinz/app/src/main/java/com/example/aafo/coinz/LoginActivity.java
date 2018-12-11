@@ -103,7 +103,6 @@ public class LoginActivity extends AppCompatActivity  {
 
 
         findViewById(R.id.login_form);
-        findViewById(R.id.login_progress);
     }
 
     private Boolean validate(){

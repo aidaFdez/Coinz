@@ -159,6 +159,7 @@ public class Medals extends AppCompatActivity {
                         }
                         break;
                     case "Informed":
+                        Log.d("NumNews", ""+News.getNumNewsToday(context));
                         if(News.getNumNewsToday(context)>=4){
                             newAchieved = true;
                             goal.setAchieved(true);
@@ -207,7 +208,7 @@ public class Medals extends AppCompatActivity {
 
     public void showHelpDialog(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Help").setMessage(R.string.achievements_explanation);
+        builder.setTitle("Achievements").setMessage(R.string.achievements_explanation);
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

@@ -2,12 +2,20 @@ package com.example.aafo.coinz;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
+
 
 public class News extends AppCompatActivity {
 
@@ -52,19 +60,23 @@ public class News extends AppCompatActivity {
 
     public void showFirstNew(){
         AlertDialog.Builder builder = new AlertDialog.Builder(News.this);
-        builder.setMessage(news[0].getDescription())
-                .setTitle(news[0].getTitle());
+        NewsStories newToShow = news[0];
+        builder.setMessage(newToShow.getDescription())
+                .setTitle(newToShow.getTitle());
         AlertDialog dialog = builder.create();
+        saveNew(News.this, newToShow);
         setNumNewsToday(News.this, getNumNewsToday(News.this)+1);
         dialog.show();
     }
 
     public void showNextNew(){
         int next = getNumNewsToday(News.this);
+        NewsStories newToShow = news[next];
         AlertDialog.Builder builder = new AlertDialog.Builder(News.this);
-        builder.setMessage(news[next].getDescription())
-                .setTitle(news[next].getTitle());
+        builder.setMessage(newToShow.getDescription())
+                .setTitle(newToShow.getTitle());
         AlertDialog dialog = builder.create();
+        saveNew(News.this, newToShow);
         setNumNewsToday(News.this, getNumNewsToday(News.this)+1);
         dialog.show();
     }
@@ -147,5 +159,46 @@ public class News extends AppCompatActivity {
         builder.setTitle("Newsstand").setMessage(R.string.news_explanation);
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public static void saveNew(Context context, NewsStories news){
+        //Get the news that were already stored and add the new one
+        ArrayList<NewsStories> saved = getNewsSaved(context);
+        saved.add(news);
+        StringBuilder debug = new StringBuilder();
+        for(NewsStories nnew:saved){
+            debug.append(nnew.getTitle()).append("\n").append(nnew.getDescription()).append("\n");
+        }
+        Log.d("Saving news", debug.toString());
+        Gson gson = new Gson();
+        String newsString = gson.toJson(saved);
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("newsSeen", newsString);
+        editor.apply();
+    }
+
+    public static ArrayList<NewsStories> getNewsSaved(Context context){
+        Gson gson = new Gson();
+        ArrayList<NewsStories> empty = new ArrayList<>();
+        empty.add(new NewsStories("", ""));
+        String storedString = getPrefs(context).getString("newsSeen", "");
+        java.lang.reflect.Type type = new TypeToken<ArrayList<NewsStories>>(){}.getType();
+        //If there is no stored array, then return default one
+        if (storedString.equals("")){
+            return empty;
+        }
+        //Transform the string into an array and return it
+        return gson.fromJson(storedString, type);
+    }
+
+    public static void resetNewsSeen(Context context){
+        SharedPreferences.Editor editor = getPrefs(context).edit();
+        editor.putString("newsSeen", "");
+        editor.apply();
+    }
+
+    public void goToSeen(View view){
+        Intent intSeen = new Intent(News.this, SeeBoughtNews.class);
+        startActivity(intSeen);
     }
 }

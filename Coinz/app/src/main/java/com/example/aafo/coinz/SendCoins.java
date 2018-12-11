@@ -447,7 +447,7 @@ public class SendCoins extends AppCompatActivity {
 
     public void showHelpDialog(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Help").setMessage(R.string.sendCoins_explanation);
+        builder.setTitle("Sending coins").setMessage(R.string.sendCoins_explanation);
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

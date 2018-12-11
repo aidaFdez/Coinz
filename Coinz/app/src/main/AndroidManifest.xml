@@ -31,19 +31,30 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Menu"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".Bank"
-            android:parentActivityName=".Menu"/>
-        <activity android:name=".SendFriends"
-            android:parentActivityName=".Menu"/>
-        <activity android:name=".Medals"
-            android:parentActivityName=".Menu"/>
-        <activity android:name=".News"
-            android:parentActivityName=".Menu"/>
-        <activity android:name=".SendCoins"
-            android:parentActivityName=".SendFriends"/>
-        <activity android:name=".goal"></activity>
+        <activity
+            android:name=".Menu"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".Bank"
+            android:parentActivityName=".Menu" />
+        <activity
+            android:name=".SendFriends"
+            android:parentActivityName=".Menu" />
+        <activity
+            android:name=".Medals"
+            android:parentActivityName=".Menu" />
+        <activity
+            android:name=".News"
+            android:parentActivityName=".Menu" />
+        <activity
+            android:name=".SendCoins"
+            android:parentActivityName=".SendFriends" />
+        <activity android:name=".goal" />
+        <activity
+            android:name=".SeeBoughtNews"
+            android:label="@string/title_activity_see_bought_news"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".News"></activity>
     </application>
 
 </manifest>
