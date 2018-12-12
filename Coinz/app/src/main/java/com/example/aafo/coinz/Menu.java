@@ -52,7 +52,10 @@ public class Menu extends AppCompatActivity {
     //Show an alert dialog with the same information as the first time the user opened the activity
     public void showHepDialog(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Help").setMessage(R.string.menu_explanation);
+        builder.setTitle("Help").setMessage(R.string.menu_explanation)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    //Nothing, just closes
+                });
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

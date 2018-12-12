@@ -489,7 +489,10 @@ public class Bank extends AppCompatActivity {
 
     public void showGuide(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Bank").setMessage(R.string.bank_explanation);
+        builder.setTitle("Bank").setMessage(R.string.bank_explanation)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    //Nothing, just closes
+                });
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

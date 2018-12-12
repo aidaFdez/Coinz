@@ -137,7 +137,10 @@ public class SendFriends extends AppCompatActivity {
         //If this is the first time the user finds the pot of gold, show a dialog saying so
         if(firstTimePotGold(SendFriends.this)){
             AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
-            builder.setTitle("Pot of gold").setMessage("Yay! You found the pot of gol! It has 50000 coins of gold, and they are all for you!");
+            builder.setTitle("Pot of gold").setMessage("Yay! You found the pot of gol! It has 50000 coins of gold, and they are all for you!")
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        //Nothing, just closes
+                    });
             MainActivity.setGold(SendFriends.this, MainActivity.getGold(SendFriends.this)+50000);
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -187,7 +190,10 @@ public class SendFriends extends AppCompatActivity {
 
     public void showHelpDialog(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Send coins to friends").setMessage(R.string.send_explanation);
+        builder.setTitle("Send coins to friends").setMessage(R.string.send_explanation)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    //Nothing, just closes
+                });
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

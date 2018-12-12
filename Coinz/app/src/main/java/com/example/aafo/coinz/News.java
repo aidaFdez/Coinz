@@ -156,7 +156,10 @@ public class News extends AppCompatActivity {
 
     public void showHelpDialog(){
         android.support.v7.app.AlertDialog.Builder builder  = new android.support.v7.app.AlertDialog.Builder(this);
-        builder.setTitle("Newsstand").setMessage(R.string.news_explanation);
+        builder.setTitle("Newsstand").setMessage(R.string.news_explanation)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    //Nothing, just closes
+                });
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
     }

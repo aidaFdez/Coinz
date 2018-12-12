@@ -181,7 +181,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             //Alert dialog that shows up in case the user tries to pick up a coin when the location is not available
                             AlertDialog.Builder builderr  = new AlertDialog.Builder(MainActivity.this);
-                            builderr.setTitle("Wait").setMessage("Please wait for the location to load.");
+                            builderr.setTitle("Wait").setMessage("Please wait for the location to load.")
+                            .setPositiveButton("OK", (dialog, which) -> {
+                                //Nothing, just closes
+                            });
                             AlertDialog dialogg = builderr.create();
                             //If the location is null, then show the above dialog. Otherwise, go on with comparing the user's distance to the marker
                             if(originLocation == null){
