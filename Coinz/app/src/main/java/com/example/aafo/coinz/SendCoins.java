@@ -79,6 +79,11 @@ public class SendCoins extends AppCompatActivity {
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
             return;
         }
+        //If the user has not cashed the 25 of the day, show a toast saying so and exit
+        if(Bank.getCoinsCashed(SendCoins.this)<25){
+            toastNot25();
+            return;
+        }
 
         //Making sure that the coins are updated
         MainActivity.setCoins(SendCoins.this);
@@ -146,6 +151,11 @@ public class SendCoins extends AppCompatActivity {
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //If the user has not cashed the 25 of the day, show a toast saying so and exit
+        if(Bank.getCoinsCashed(SendCoins.this)<25){
+            toastNot25();
             return;
         }
 
@@ -280,6 +290,11 @@ public class SendCoins extends AppCompatActivity {
         String emailUser = user.getEmail();
         if(emailString.equals(emailUser)){
             Toast.makeText(this, "You can not send coins to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //If the user has not cashed the 25 of the day, show a toast saying so and exit
+        if(Bank.getCoinsCashed(SendCoins.this)<25){
+            toastNot25();
             return;
         }
 
@@ -453,5 +468,9 @@ public class SendCoins extends AppCompatActivity {
                 });
         android.support.v7.app.AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void toastNot25(){
+        Toast.makeText(this, "You have not cashed 25 coins yet", Toast.LENGTH_SHORT).show();
     }
 }

@@ -75,9 +75,13 @@ public class Medals extends AppCompatActivity {
             if(!goal.getAchieved()){
                 switch (goal.getName()) {
                     case "Collector":
-                        if (MainActivity.getPickedCoins(context).size() >= 50) {
+                        if (MainActivity.getPickedCoins(context).size() >= 50 && !achievedCollector(context)) {
                             goal.setAchieved(true);
                             newAchieved = true;
+                            //Save it on the shared preferences, so it does not get restarted when the day changes
+                            SharedPreferences.Editor editor = getPrefs(context).edit();
+                            editor.putBoolean("achievedCollector", true);
+                            editor.commit();
                         }
                         break;
                     case "Friendly person":
@@ -200,6 +204,8 @@ public class Medals extends AppCompatActivity {
         editor.commit();
         return ret;
     }
+
+    private static boolean achievedCollector(Context context){return getPrefs(context).getBoolean("achievedCollector", false);}
 
     //Show an alert dialog with the same information as the first time the user opened the activity
     public void showHelp(View view){

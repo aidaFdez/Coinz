@@ -64,6 +64,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String jSon;
     private HashMap<String, Integer> coinsToday = new HashMap<>();
     public static HashMap<String, Float> ratesHash = new HashMap<>();
+    static {
+        //Put some default values in case it is not initialized because of internet connection or similar.
+        ratesHash.put("QUID", 0.0f);
+        ratesHash.put("SHIL", 0.0f);
+        ratesHash.put("PENY", 0.0f);
+        ratesHash.put("DOLR", 0.0f);
+    }
 
     private String TAG = "MainActivity";
 
@@ -588,17 +595,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         editor.commit();
     }
 
-    //Get the number of own coins of each of the currency
-    public static int getNumShil(Context context){setCoins(context);return coinsShil.size();}
-    public static int getNumDolr(Context context){setCoins(context);return coinsDolr.size();}
-    public static int getNumPenny(Context context){setCoins(context);return coinsPeny.size();}
-    public static int getNumQuid(Context context){setCoins(context);return coinsQuid.size();}
+    //Get the number of own coins of each of the currency. -1 to account for the empty ones
+    public static int getNumShil(Context context){ setCoins(context);return coinsShil.size() -1;}
+    public static int getNumDolr(Context context){setCoins(context);return coinsDolr.size()-1;}
+    public static int getNumPenny(Context context){setCoins(context);return coinsPeny.size()-1;}
+    public static int getNumQuid(Context context){setCoins(context);return coinsQuid.size()-1;}
 
-    //Get the number of coins from friends of each of the currencies
-    public static int getNumShilFriends(Context context){setCoinsFriends(context);return coinsShilFriends.size();}
-    public static int getNumDolrFriends(Context context){setCoinsFriends(context);return coinsDolrFriends.size();}
-    public static int getNumPennyFriends(Context context){setCoinsFriends(context);return coinsPenyFriends.size();}
-    public static int getNumQuidFriends(Context context){setCoinsFriends(context);return coinsQuidFriends.size();}
+    //Get the number of coins from friends of each of the currencies. -1 to account for the empty ones
+    public static int getNumShilFriends(Context context){setCoinsFriends(context);return coinsShilFriends.size()-1;}
+    public static int getNumDolrFriends(Context context){setCoinsFriends(context);return coinsDolrFriends.size()-1;}
+    public static int getNumPennyFriends(Context context){setCoinsFriends(context);return coinsPenyFriends.size()-1;}
+    public static int getNumQuidFriends(Context context){setCoinsFriends(context);return coinsQuidFriends.size()-1;}
 
     //Get the coins from friends. Basically the same as getCoins
     public static HashMap<String, String[]> getCoinsFriends(Context context){
@@ -643,6 +650,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static HashMap<String, String[]> coinsDolr = new HashMap<>();
     public static HashMap<String, String[]> coinsShil = new HashMap<>();
 
+    static {
+        //Initialize in case it is empty because of connection or not been picked up yet
+        coinsQuid.put("0", new String[]{"0", ""});
+        coinsShil.put("0", new String[]{"0", ""});
+        coinsDolr.put("0", new String[]{"0", ""});
+        coinsPeny.put("0", new String[]{"0", ""});
+    }
+
     //Set the hashmaps for each of the coins.
     public static void setCoins(Context context){
         HashMap<String, String[]> hashCoins = getCoinsOverall(context);
@@ -670,6 +685,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static HashMap<String, String[]> coinsPenyFriends = new HashMap<>();
     public static HashMap<String, String[]> coinsDolrFriends = new HashMap<>();
     public static HashMap<String, String[]> coinsShilFriends = new HashMap<>();
+    static {
+        //Initialize in case it is empty because of connection or not been picked up yet
+        coinsQuidFriends.put("0", new String[]{"0", ""});
+        coinsPenyFriends.put("0", new String[]{"0", ""});
+        coinsDolrFriends.put("0", new String[]{"0", ""});
+        coinsShilFriends.put("0", new String[]{"0", ""});
+    }
 
     public static void setCoinsFriends(Context context){
         HashMap<String, String[]> hashCoins = getCoinsFriends(context);
