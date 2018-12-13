@@ -48,6 +48,8 @@ public class SendCoins extends AppCompatActivity {
             showHelpDialog();
         }
 
+        MainActivity.setCoinsFriends(SendCoins.this);
+        MainActivity.setCoins(SendCoins.this);
         displayDolr();
         displayPenny();
         displayQuid();

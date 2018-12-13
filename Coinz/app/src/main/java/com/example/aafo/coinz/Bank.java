@@ -34,6 +34,8 @@ public class Bank extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setTitle("Bank");
 
+        MainActivity.setCoins(Bank.this);
+        MainActivity.setCoinsFriends(Bank.this);
         displayInfo();
         displayDolr();
         displayPenny();
