@@ -137,7 +137,7 @@ public class SendFriends extends AppCompatActivity {
         //If this is the first time the user finds the pot of gold, show a dialog saying so
         if(firstTimePotGold(SendFriends.this)){
             AlertDialog.Builder builder  = new AlertDialog.Builder(SendFriends.this);
-            builder.setTitle("Pot of gold").setMessage("Yay! You found the pot of gol! It has 50000 coins of gold, and they are all for you!")
+            builder.setTitle("Pot of gold").setMessage("Yay! You found the pot of gold! It has 50000 coins of gold, and they are all for you!")
                     .setPositiveButton("OK", (dialog, which) -> {
                         //Nothing, just closes
                     });

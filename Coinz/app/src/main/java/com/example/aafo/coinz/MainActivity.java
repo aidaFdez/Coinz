@@ -95,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             setDatePrefs(MainActivity.this);
             resetVariables(MainActivity.this);
         }else{
+            if(getJson(MainActivity.this).equals("Unable to load content. Check your network connection")){
+                //If the map was not downloaded for some reason last time
+                getTheMap();
+            }
             Log.d(TAG, "Map already downloaded");
             jSon = getJson(MainActivity.this);
             //Reset all the daily variables
@@ -280,6 +284,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             jSon = new DownloadFileTask().execute(url).get();
             setJson(this, jSon);
+            if(jSon.equals("Unable to load content. Check your network connection")){
+                Toast.makeText(this, "Unable to load content. Check your network connection and restart the app.", Toast.LENGTH_SHORT).show();
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
